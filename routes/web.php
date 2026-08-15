@@ -43,8 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('ordenes-compra-cliente', OrdenCompraClienteController::class);
 
     Route::get('cotizaciones/{cotizacion}/pdf', [CotizacionController::class, 'pdf'])->name('cotizaciones.pdf');
+    Route::get('cotizaciones/{cotizacion}/pdf/descargar', [CotizacionController::class, 'pdfDescargar'])->name('cotizaciones.pdf.descargar');
     Route::patch('cotizaciones/{cotizacion}/aprobar', [CotizacionController::class, 'aprobar'])->name('cotizaciones.aprobar');
-    Route::resource('cotizaciones', CotizacionController::class);
+    Route::resource('cotizaciones', CotizacionController::class)
+    ->parameters(['cotizaciones' => 'cotizacion']);
 
     Route::resource('users', UserController::class)
         ->middleware('rol:administrador');

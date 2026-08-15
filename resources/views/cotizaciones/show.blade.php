@@ -11,10 +11,10 @@
                 </div>
             </div>
             <div class="flex flex-wrap gap-2">
-                <a href="{{ route('cotizaciones.pdf', $cotizacion) }}" target="_blank"
-                   class="px-4 py-2 bg-gray-200 dark:bg-darker-bg text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">
+                <button type="button" onclick="document.getElementById('modal-pdf').classList.remove('hidden')"
+                    class="px-4 py-2 bg-gray-200 dark:bg-darker-bg text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-300 transition-colors">
                     PDF / Imprimir
-                </a>
+                </button>
                 @if($cotizacion->estado === 'pendiente')
                     <a href="{{ route('cotizaciones.edit', $cotizacion) }}"
                        class="px-4 py-2 bg-gray-200 dark:bg-darker-bg text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">
@@ -31,10 +31,16 @@
                     </form>
                 @endif
                 @if($cotizacion->estado === 'aprobada')
-                    <a href="{{ route('ventas.create', ['cotizacion_id' => $cotizacion->id]) }}"
-                       class="px-4 py-2 bg-purple-primary text-white rounded-lg text-sm font-semibold hover:bg-purple-light transition-colors">
-                        Generar Venta
-                    </a>
+                    @if(\Illuminate\Support\Facades\Route::has('ventas.create'))
+                        <a href="{{ route('ventas.create', ['cotizacion_id' => $cotizacion->id]) }}"
+                            class="px-4 py-2 bg-purple-primary text-white rounded-lg text-sm font-semibold hover:bg-purple-light transition-colors">
+                                Generar Venta
+                        </a>
+                    @else
+                        <span class="px-4 py-2 bg-gray-200 dark:bg-darker-bg text-gray-500 rounded-lg text-sm font-semibold cursor-not-allowed" title="Módulo de Ventas aún no disponible">
+                            Generar Venta (próximamente)
+                        </span>
+                    @endif
                 @endif
             </div>
         </div>
@@ -167,6 +173,30 @@
                 </div>
             </div>
             @endif
+        </div>
+    </div>
+{{-- Modal Vista Previa PDF --}}
+    <div id="modal-pdf" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70">
+        <div class="bg-white dark:bg-card-bg rounded-2xl shadow-2xl ring-1 ring-black/10 w-full max-w-6xl h-[80vh] flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-600/30 bg-gray-50 dark:bg-darker-bg">
+                <h3 class="font-bold text-gray-900 dark:text-white">Vista previa — Cotización #{{ $cotizacion->id }}</h3>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('cotizaciones.pdf.descargar', $cotizacion) }}"
+                        class="px-4 py-1.5 bg-purple-primary text-white rounded-lg text-sm font-semibold hover:bg-purple-light transition-colors">
+                        Descargar PDF
+                    </a>
+                    <button type="button" onclick="document.getElementById('modal-pdf').classList.add('hidden')"
+                            class="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-300 transition-colors">
+                        ✕ Cerrar
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 bg-gray-200 dark:bg-gray-900 p-4 overflow-hidden">
+                <iframe src="{{ route('cotizaciones.pdf', $cotizacion) }}"
+                        class="w-full h-full bg-white rounded-lg shadow-inner"
+                        style="border: none; overflow: hidden;"
+                        scrolling="auto"></iframe>
+            </div>
         </div>
     </div>
 </x-app-layout>

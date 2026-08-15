@@ -20,6 +20,8 @@ class Cotizacion extends Model
         'observaciones',
     ];
 
+    protected $table = 'cotizaciones';
+
     protected function casts(): array
     {
         return [
@@ -27,7 +29,7 @@ class Cotizacion extends Model
             'created_at' => 'datetime',
         ];
     }
-
+    
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');

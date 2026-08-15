@@ -186,14 +186,26 @@ class CotizacionController extends Controller
             'resumen',
         ]);
 
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('cotizaciones.pdf', compact('cotizacion'));
-
-            return $pdf->download('cotizacion-' . $cotizacion->id . '.pdf');
-        }
-
+        // Siempre devuelve la vista HTML (vista previa), nunca fuerza descarga
         return view('cotizaciones.pdf', compact('cotizacion'));
     }
+
+    public function pdfDescargar(Cotizacion $cotizacion)
+    {
+        $cotizacion->load([
+            'cliente',
+            'detalles.producto',
+            'detalles.proveedor',
+            'resumen',
+        ]);
+
+    if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('cotizaciones.pdf', compact('cotizacion'));
+        return $pdf->download('cotizacion-' . $cotizacion->id . '.pdf');
+    }
+
+    return view('cotizaciones.pdf', compact('cotizacion'));
+}
 
     private function validarCotizacion(Request $request): array
     {
