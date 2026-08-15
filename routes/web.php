@@ -3,7 +3,9 @@
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\CotizacionController;
 use App\Http\Controllers\MovimientoInventarioController;
+use App\Http\Controllers\OrdenCompraClienteController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProveedorController;
@@ -37,6 +39,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventario/kardex', [MovimientoInventarioController::class, 'kardex'])->name('inventario.kardex');
     Route::get('/inventario/ajuste', [MovimientoInventarioController::class, 'createAjuste'])->name('inventario.ajuste.create');
     Route::post('/inventario/ajuste', [MovimientoInventarioController::class, 'storeAjuste'])->name('inventario.ajuste.store');
+
+    Route::resource('ordenes-compra-cliente', OrdenCompraClienteController::class);
+
+    Route::get('cotizaciones/{cotizacion}/pdf', [CotizacionController::class, 'pdf'])->name('cotizaciones.pdf');
+    Route::patch('cotizaciones/{cotizacion}/aprobar', [CotizacionController::class, 'aprobar'])->name('cotizaciones.aprobar');
+    Route::resource('cotizaciones', CotizacionController::class);
 
     Route::resource('users', UserController::class)
         ->middleware('rol:administrador');

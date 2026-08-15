@@ -4,11 +4,11 @@
 
 **Instrucción para cualquier agente que trabaje en este documento:** antes de escribir una sola línea de código, lee estos 5 campos para saber exactamente dónde quedó el proyecto — no hace falta revisar el código para ubicarte. Cuando termines tu sesión de trabajo (te quedes sin tokens, termines una fase, o el usuario corte la conversación), **actualiza estos campos como tu último paso antes de responder por última vez**. Así el siguiente agente retoma sin perder contexto.
 
-- **Última actualización:** 12 ago 2026
-- **Fase actual:** Fase 3 — Módulos maestros (catálogo) (COMPLETADA)
-- **Último paso completado:** Fase 3 100% completada (CRUDs de Proveedores, Clientes, Productos con sub-asociaciones de proveedores y presentaciones de compra, Formulario de Configuración, Kardex de Inventario y Ajustes Manuales).
-- **Próximo paso concreto:** Fase 4 — Órdenes de compra del cliente (`OrdenCompraClienteController` y vistas)
-- **Bloqueos o decisiones pendientes:** Ninguno
+- **Última actualización:** 15 ago 2026
+- **Fase actual:** Fase 5 — Cotizaciones (COMPLETADA)
+- **Último paso completado:** Fases 4 y 5 completadas: módulo OC de clientes (CRUD, archivo, filtros, enlaces a cotización/venta) y módulo Cotizaciones (CRUD, líneas dinámicas, resumen financiero, aprobar, PDF imprimible).
+- **Próximo paso concreto:** Fase 6 — Ventas (`VentaController` y vistas)
+- **Bloqueos o decisiones pendientes:** Instalar `barryvdh/laravel-dompdf` con PHP 8.3+ para descarga PDF directa (`composer require barryvdh/laravel-dompdf`). La ruta `/cotizaciones/{id}/pdf` ya funciona como vista imprimible sin el paquete.
 - **Notas para el siguiente agente:** Usuarios: `admin@erp.local` / `trabajador@erp.local` (password: `password`). Panel de usuarios y configuración solo para admin.
 
 ---
@@ -169,29 +169,29 @@ Repetir este patrón para **Proveedores** y **Clientes** (estructura idéntica):
 
 ## Fase 4 — Órdenes de compra del cliente (módulo nuevo)
 
-- [ ] `OrdenCompraClienteController` resource
-- [ ] `ordenes-compra-cliente/index.blade.php`: listado filtrable por estado (pendiente/procesada/anulada) y cliente
-- [ ] `ordenes-compra-cliente/create.blade.php`: cliente, número de OC, fecha de recepción, input `type="file"` para PDF/imagen, observaciones
-- [ ] Guardar el archivo con `Storage::disk('public')->putFile('ordenes-compra-cliente', $request->file('archivo'))`
-- [ ] `ordenes-compra-cliente/show.blade.php`: detalle + enlace de descarga del archivo + botones "Generar cotización" y "Generar venta"
-- [ ] Los botones enlazan a `cotizaciones/create?orden_compra_cliente_id=X` / `ventas/create?orden_compra_cliente_id=X`, precargando `cliente_id` desde la OC
-- [ ] Al guardar la cotización/venta generada, actualizar `estado = 'procesada'` y el FK correspondiente en `ordenes_compra_cliente`
-- [ ] `ordenes-compra-cliente/edit.blade.php`: editar datos o anular
+- [x] `OrdenCompraClienteController` resource
+- [x] `ordenes-compra-cliente/index.blade.php`: listado filtrable por estado (pendiente/procesada/anulada) y cliente
+- [x] `ordenes-compra-cliente/create.blade.php`: cliente, número de OC, fecha de recepción, input `type="file"` para PDF/imagen, observaciones
+- [x] Guardar el archivo con `Storage::disk('public')->putFile('ordenes-compra-cliente', $request->file('archivo'))`
+- [x] `ordenes-compra-cliente/show.blade.php`: detalle + enlace de descarga del archivo + botones "Generar cotización" y "Generar venta"
+- [x] Los botones enlazan a `cotizaciones/create?orden_compra_cliente_id=X` / `ventas/create?orden_compra_cliente_id=X`, precargando `cliente_id` desde la OC
+- [x] Al guardar la cotización/venta generada, actualizar `estado = 'procesada'` y el FK correspondiente en `ordenes_compra_cliente`
+- [x] `ordenes-compra-cliente/edit.blade.php`: editar datos o anular
 
 ---
 
 ## Fase 5 — Cotizaciones (módulo central)
 
-- [ ] `CotizacionController` resource
-- [ ] `cotizaciones/create.blade.php`: cabecera (cliente, fecha, observaciones) + tabla dinámica de líneas (producto, proveedor, cantidad, precio venta, precio compra, IGV compra) con JS plano para agregar/quitar filas
-- [ ] Al enviar, guardar `cotizacion` + todas las `cotizacion_detalle` en una transacción (`DB::transaction`)
-- [ ] Calcular y guardar `cotizacion_resumen` en el mismo submit: `subtotal` = suma de `precio_venta_total` del detalle, `igv`, `retencion`, `compra_activa`, `compra_fija`, `comision_venta`, `comision_ganancia` según los porcentajes de `configuracion`
-- [ ] Recordar que el trigger `trg_resumen_valida_subtotal` rechaza el insert si el `subtotal` no cuadra con la suma real — validar en el backend antes de enviar para evitar una excepción SQL cruda
-- [ ] `cotizaciones/index.blade.php`: filtro por estado (pendiente/aprobada/rechazada/facturada)
-- [ ] `cotizaciones/show.blade.php`: detalle de líneas + bloque de resumen financiero (ganancia, comisiones, rentabilidad) — visible completo solo para `administrador`; el `trabajador` ve el detalle de líneas pero puede ocultarse la rentabilidad si se decide restringir (definir con el negocio si aplica)
-- [ ] `cotizaciones/edit.blade.php`: solo editable si `estado = 'pendiente'`
-- [ ] Acción "Aprobar": cambia `estado` a `aprobada`, disponible para generar la venta
-- [ ] `cotizaciones/pdf.blade.php`: vista imprimible (usar `dompdf` o similar, `composer require barryvdh/laravel-dompdf`)
+- [x] `CotizacionController` resource
+- [x] `cotizaciones/create.blade.php`: cabecera (cliente, fecha, observaciones) + tabla dinámica de líneas (producto, proveedor, cantidad, precio venta, precio compra, IGV compra) con JS plano para agregar/quitar filas
+- [x] Al enviar, guardar `cotizacion` + todas las `cotizacion_detalle` en una transacción (`DB::transaction`)
+- [x] Calcular y guardar `cotizacion_resumen` en el mismo submit: `subtotal` = suma de `precio_venta_total` del detalle, `igv`, `retencion`, `compra_activa`, `compra_fija`, `comision_venta`, `comision_ganancia` según los porcentajes de `configuracion`
+- [x] Recordar que el trigger `trg_resumen_valida_subtotal` rechaza el insert si el `subtotal` no cuadra con la suma real — validar en el backend antes de enviar para evitar una excepción SQL cruda
+- [x] `cotizaciones/index.blade.php`: filtro por estado (pendiente/aprobada/rechazada/facturada)
+- [x] `cotizaciones/show.blade.php`: detalle de líneas + bloque de resumen financiero (ganancia, comisiones, rentabilidad) — visible completo solo para `administrador`; el `trabajador` ve el detalle de líneas pero puede ocultarse la rentabilidad si se decide restringir (definir con el negocio si aplica)
+- [x] `cotizaciones/edit.blade.php`: solo editable si `estado = 'pendiente'`
+- [x] Acción "Aprobar": cambia `estado` a `aprobada`, disponible para generar la venta
+- [x] `cotizaciones/pdf.blade.php`: vista imprimible (usar `dompdf` o similar, `composer require barryvdh/laravel-dompdf`)
 
 ---
 
