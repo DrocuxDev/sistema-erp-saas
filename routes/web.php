@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VentaController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -47,6 +48,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('cotizaciones/{cotizacion}/aprobar', [CotizacionController::class, 'aprobar'])->name('cotizaciones.aprobar');
     Route::resource('cotizaciones', CotizacionController::class)
     ->parameters(['cotizaciones' => 'cotizacion']);
+
+    Route::resource('ventas', VentaController::class)
+    ->parameters(['ventas' => 'venta']);
 
     Route::resource('users', UserController::class)
         ->middleware('rol:administrador');

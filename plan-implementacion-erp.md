@@ -198,12 +198,12 @@ Repetir este patrón para **Proveedores** y **Clientes** (estructura idéntica):
 
 ## Fase 6 — Ventas
 
-- [ ] `VentaController` resource
-- [ ] `ventas/create.blade.php`: si viene de una cotización aprobada (`?cotizacion_id=X`), precargar cliente y copiar las líneas de `cotizacion_detalle` a `venta_detalle`; si no, permitir venta directa
-- [ ] Validar en backend que cada producto tenga `puede_venderse = true` antes del insert (el trigger `trg_venta_detalle_valida_producto` es el respaldo final, no la única validación)
-- [ ] Al confirmar la venta, generar automáticamente los `movimientos_inventario` de tipo `salida` por cada línea (esto dispara el trigger de stock)
-- [ ] Si la venta nace de una cotización, actualizar `cotizaciones.estado = 'facturada'`
-- [ ] `ventas/index.blade.php`, `ventas/show.blade.php`
+- [x] `VentaController` resource
+- [x] `ventas/create.blade.php`: si viene de una cotización aprobada (`?cotizacion_id=X`), precargar cliente y copiar las líneas de `cotizacion_detalle` a `venta_detalle`; si no, permitir venta directa
+- [x] Validar en backend que cada producto tenga `puede_venderse = true` antes del insert (el trigger `trg_venta_detalle_valida_producto` es el respaldo final, no la única validación)
+- [x] Al confirmar la venta, generar automáticamente los `movimientos_inventario` de tipo `salida` por cada línea (esto dispara el trigger de stock)
+- [x] Si la venta nace de una cotización, actualizar `cotizaciones.estado = 'facturada'`
+- [x] `ventas/index.blade.php`, `ventas/show.blade.php`
 
 ---
 
