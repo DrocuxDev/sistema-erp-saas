@@ -195,6 +195,7 @@ Repetir este patrón para **Proveedores** y **Clientes** (estructura idéntica):
 
 ---
 
+
 ## Fase 6 — Ventas
 
 - [ ] `VentaController` resource
