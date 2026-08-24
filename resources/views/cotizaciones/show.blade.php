@@ -175,7 +175,7 @@
             @endif
         </div>
     </div>
-{{-- Modal Vista Previa PDF --}}
+{{-- Modal Vista Previa PDF  --}}
     <div id="modal-pdf" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70">
         <div class="bg-white dark:bg-card-bg rounded-2xl shadow-2xl ring-1 ring-black/10 w-full max-w-6xl h-[80vh] flex flex-col overflow-hidden">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-600/30 bg-gray-50 dark:bg-darker-bg">
