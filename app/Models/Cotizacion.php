@@ -15,9 +15,20 @@ class Cotizacion extends Model
         'cliente_id',
         'usuario_id',
         'orden_compra_cliente_id',
+        'serie',
+        'correlativo',
+        'codigo',
+        'version',
+        'tipo_cotizacion',
+        'asunto',
+        'representante',
         'fecha',
         'estado',
         'observaciones',
+        'plazo_entrega',
+        'forma_pago',
+        'logistica',
+        'validez_oferta',
     ];
 
     protected $table = 'cotizaciones';
@@ -27,7 +38,34 @@ class Cotizacion extends Model
         return [
             'fecha' => 'date',
             'created_at' => 'datetime',
+            'correlativo' => 'integer',
+            'version' => 'integer',
         ];
+    }
+
+    public function getCodigoFormateadoAttribute(): string
+    {
+        if (! empty($this->codigo)) {
+            return $this->codigo;
+        }
+
+        $serie = $this->serie ?: 'C001';
+        $correlativo = $this->correlativo ?? 0;
+
+        return "{$serie}-{$correlativo}";
+    }
+
+    public function getVersionFormateadaAttribute(): string
+    {
+        return sprintf('%03d', (int) ($this->version ?: 1));
+    }
+
+    public function getTipoCotizacionLabelAttribute(): string
+    {
+        return match ($this->tipo_cotizacion) {
+            'servicio' => 'Servicio TI',
+            default => 'Producto / Equipamiento',
+        };
     }
     
     public function cliente(): BelongsTo
@@ -60,3 +98,4 @@ class Cotizacion extends Model
         return $this->hasOne(Venta::class, 'cotizacion_id');
     }
 }
+

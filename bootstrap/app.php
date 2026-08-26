@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'rol' => \App\Http\Middleware\CheckRol::class,
+            'modulo' => \App\Http\Middleware\CheckModuloPermiso::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\Configuracion;
 use App\Models\Cotizacion;
 use App\Models\OrdenCompraCliente;
 use App\Models\Producto;
+use App\Models\SerieDocumento;
 use App\Models\Venta;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -56,8 +59,15 @@ class VentaController extends Controller
             $clienteIdPreseleccionado = $ordenCompra->cliente_id;
         }
 
+        $serieDoc = SerieDocumento::where('tipo_documento', 'venta')
+            ->where('activo', true)
+            ->orderByDesc('es_predeterminado')
+            ->first();
+
+        $proximoCodigo = $serieDoc ? $serieDoc->proximo_codigo : 'V001-000001';
+
         return view('ventas.create', compact(
-            'clientes', 'productos', 'cotizacion', 'ordenCompra', 'clienteIdPreseleccionado', 'lineasPrecargadas'
+            'clientes', 'productos', 'cotizacion', 'ordenCompra', 'clienteIdPreseleccionado', 'lineasPrecargadas', 'proximoCodigo'
         ));
     }
 
@@ -97,14 +107,23 @@ class VentaController extends Controller
             $total += round($linea['cantidad'] * $linea['precio_venta_unit'], 2);
         }
         $total = round($total, 2);
+        $subtotal = round($total / 1.18, 2);
+        $igv = round($total - $subtotal, 2);
 
-        $venta = DB::transaction(function () use ($data, $total) {
+        $venta = DB::transaction(function () use ($data, $subtotal, $igv, $total) {
+            $correlativoData = SerieDocumento::siguienteCodigo('venta');
+
             $venta = Venta::create([
                 'cotizacion_id'            => $data['cotizacion_id'] ?? null,
                 'cliente_id'               => $data['cliente_id'],
                 'usuario_id'               => auth()->id(),
                 'orden_compra_cliente_id'  => $data['orden_compra_cliente_id'] ?? null,
+                'serie'                    => $correlativoData['serie'],
+                'correlativo'              => $correlativoData['correlativo'],
+                'codigo'                   => $correlativoData['codigo'],
                 'fecha'                    => $data['fecha'],
+                'subtotal'                 => $subtotal,
+                'igv'                      => $igv,
                 'total'                    => $total,
             ]);
 
@@ -115,7 +134,6 @@ class VentaController extends Controller
                     'cantidad'            => $linea['cantidad'],
                     'precio_venta_unit'   => $linea['precio_venta_unit'],
                     'precio_compra_unit'  => $linea['precio_compra_unit'],
-                    
                 ]);
 
                 // Movimiento de inventario tipo salida (dispara el trigger de stock)
@@ -150,7 +168,7 @@ class VentaController extends Controller
         });
 
         return redirect()->route('ventas.show', $venta)
-            ->with('success', 'Venta registrada correctamente.');
+            ->with('success', "Venta {$venta->codigo_formateado} registrada correctamente.");
     }
 
     public function show(Venta $venta)
@@ -160,9 +178,49 @@ class VentaController extends Controller
         $detalle = DB::table('venta_detalle')
             ->join('productos', 'productos.id', '=', 'venta_detalle.producto_id')
             ->where('venta_id', $venta->id)
-            ->select('venta_detalle.*', 'productos.nombre as producto_nombre', 'productos.unidad_medida')
+            ->select('venta_detalle.*', 'productos.nombre as producto_nombre', 'productos.sku as producto_sku', 'productos.unidad_medida')
             ->get();
 
-        return view('ventas.show', compact('venta', 'detalle'));
+        $configuracion = Configuracion::where('activo', true)->first();
+
+        return view('ventas.show', compact('venta', 'detalle', 'configuracion'));
+    }
+
+    public function pdf(Venta $venta)
+    {
+        $venta->load('cliente', 'usuario', 'cotizacion', 'ordenCompraCliente');
+
+        $detalle = DB::table('venta_detalle')
+            ->join('productos', 'productos.id', '=', 'venta_detalle.producto_id')
+            ->where('venta_id', $venta->id)
+            ->select('venta_detalle.*', 'productos.nombre as producto_nombre', 'productos.sku as producto_sku', 'productos.unidad_medida')
+            ->get();
+
+        $configuracion = Configuracion::where('activo', true)->first();
+
+        $pdf = Pdf::loadView('ventas.pdf', compact('venta', 'detalle', 'configuracion'))
+            ->setPaper('a4', 'portrait')
+            ->setOption(['isRemoteEnabled' => true, 'isHtml5ParserEnabled' => true]);
+
+        return $pdf->stream("Venta_{$venta->codigo_formateado}.pdf");
+    }
+
+    public function descargarPdf(Venta $venta)
+    {
+        $venta->load('cliente', 'usuario', 'cotizacion', 'ordenCompraCliente');
+
+        $detalle = DB::table('venta_detalle')
+            ->join('productos', 'productos.id', '=', 'venta_detalle.producto_id')
+            ->where('venta_id', $venta->id)
+            ->select('venta_detalle.*', 'productos.nombre as producto_nombre', 'productos.sku as producto_sku', 'productos.unidad_medida')
+            ->get();
+
+        $configuracion = Configuracion::where('activo', true)->first();
+
+        $pdf = Pdf::loadView('ventas.pdf', compact('venta', 'detalle', 'configuracion'))
+            ->setPaper('a4', 'portrait')
+            ->setOption(['isRemoteEnabled' => true, 'isHtml5ParserEnabled' => true]);
+
+        return $pdf->download("Venta_{$venta->codigo_formateado}.pdf");
     }
 }

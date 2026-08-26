@@ -1,131 +1,196 @@
 <aside 
-    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" 
-    class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-sidebar-bg border-r border-gray-200 dark:border-gray-700/50 transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto flex flex-col"
+    :class="{
+        'translate-x-0': sidebarOpen,
+        '-translate-x-full': !sidebarOpen,
+        'lg:w-64 lg:translate-x-0': !sidebarCollapsed,
+        'lg:w-0 lg:-translate-x-full lg:border-r-0': sidebarCollapsed
+    }" 
+    class="fixed lg:sticky top-0 inset-y-0 left-0 z-40 h-screen bg-white dark:bg-sidebar-bg border-r border-gray-200 dark:border-gray-700/50 transition-all duration-300 ease-in-out flex flex-col shrink-0 overflow-hidden select-none"
 >
-    {{-- Logo --}}
-    <div class="p-5 border-b border-gray-200 dark:border-gray-700/50 flex items-center justify-between shrink-0">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-purple-primary rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                </svg>
-            </div>
-            <span class="font-semibold text-gray-900 dark:text-white text-lg">{{ config('app.name', 'ERP') }}</span>
+    {{-- Logo Limpio (Solo Texto Jhardsystex ERP) & Botón Ocultar --}}
+    <div class="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700/50 flex items-center justify-between shrink-0 h-16">
+        <a href="{{ route('dashboard') }}" class="flex items-center min-w-0">
+            <span class="font-extrabold text-gray-900 dark:text-white text-base sm:text-lg tracking-tight truncate">
+                Jhardsystex ERP
+            </span>
         </a>
-        {{-- Close button (mobile only) --}}
-        <button @click="sidebarOpen = false" class="lg:hidden p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-md">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
+
+        <div class="flex items-center gap-1">
+            {{-- Botón Ocultar en Desktop --}}
+            <button @click="sidebarCollapsed = true" 
+                    title="Ocultar menú lateral"
+                    class="hidden lg:flex p-1.5 text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded-lg transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+            </button>
+
+            {{-- Botón Cerrar en Móvil --}}
+            <button @click="sidebarOpen = false" 
+                    class="lg:hidden p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
-    {{-- Navigation (scrollable) --}}
-    <nav class="p-4 space-y-1 mt-2 flex-1 overflow-y-auto">
-        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-            </svg>
-            <span>Dashboard</span>
-        </x-nav-link>
-
-        <div class="pt-5">
-            <p class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Maestros</p>
-            
-            <x-nav-link :href="route('proveedores.index')" :active="request()->routeIs('proveedores.*')">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+    {{-- Navegación con Scrollbar Independiente --}}
+    <nav class="p-3 sm:p-4 space-y-1 flex-1 overflow-y-auto custom-scrollbar">
+        
+        @if(auth()->user()->tieneModulo('dashboard'))
+            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                 </svg>
-                <span>Proveedores</span>
+                <span>Dashboard</span>
             </x-nav-link>
+        @endif
 
-            <x-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
-                </svg>
-                <span>Clientes</span>
-            </x-nav-link>
-
-            <x-nav-link :href="route('productos.index')" :active="request()->routeIs('productos.*')">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
-                </svg>
-                <span>Productos</span>
-            </x-nav-link>
-
-            <x-nav-link :href="route('inventario.kardex')" :active="request()->routeIs('inventario.*')">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
-                </svg>
-                <span>Inventario / Kardex</span>
-            </x-nav-link>
-        </div>
-
-        <div class="pt-5">
-            <p class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ventas</p>
-
-            <x-nav-link :href="route('ordenes-compra-cliente.index')" :active="request()->routeIs('ordenes-compra-cliente.*')">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-                </svg>
-                <span>OC de Clientes</span>
-            </x-nav-link>
-
-            <x-nav-link :href="route('cotizaciones.index')" :active="request()->routeIs('cotizaciones.*')">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
-                </svg>
-                <span>Cotizaciones</span>
-            </x-nav-link>
-            <x-nav-link :href="route('ventas.index')" :active="request()->routeIs('ventas.*')">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
-                </svg>
-                <span>Ventas</span>
-            </x-nav-link>
-        </div>
-
-        @if (auth()->user()->rol === 'administrador')
-            <div class="pt-5">
-                <p class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Administración</p>
+        {{-- SECCIÓN MAESTROS --}}
+        @if(auth()->user()->tieneModulo('proveedores') || auth()->user()->tieneModulo('clientes') || auth()->user()->tieneModulo('productos') || auth()->user()->tieneModulo('inventario'))
+            <div class="pt-4">
+                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Maestros & Catálogo</p>
                 
-                <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                    </svg>
-                    <span>Usuarios</span>
-                </x-nav-link>
+                @if(auth()->user()->tieneModulo('proveedores'))
+                    <x-nav-link :href="route('proveedores.index')" :active="request()->routeIs('proveedores.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span>Proveedores</span>
+                    </x-nav-link>
+                @endif
 
-                <x-nav-link :href="route('configuracion.edit')" :active="request()->routeIs('configuracion.*')">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-                    </svg>
-                    <span>Configuración</span>
-                </x-nav-link>
+                @if(auth()->user()->tieneModulo('clientes'))
+                    <x-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span>Clientes</span>
+                    </x-nav-link>
+                @endif
 
-                <x-nav-link :href="route('auditoria.index')" :active="request()->routeIs('auditoria.*')">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                @if(auth()->user()->tieneModulo('productos'))
+                    <x-nav-link :href="route('productos.index')" :active="request()->routeIs('productos.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <span>Productos</span>
+                    </x-nav-link>
+                @endif
+
+                @if(auth()->user()->tieneModulo('inventario'))
+                    <x-nav-link :href="route('inventario.kardex')" :active="request()->routeIs('inventario.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                        </svg>
+                        <span>Inventario / Kardex</span>
+                    </x-nav-link>
+                @endif
+            </div>
+        @endif
+
+        {{-- SECCIÓN VENTAS --}}
+        @if(auth()->user()->tieneModulo('ordenes_compra_cliente') || auth()->user()->tieneModulo('cotizaciones') || auth()->user()->tieneModulo('ventas'))
+            <div class="pt-4">
+                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Flujo Comercial</p>
+
+                @if(auth()->user()->tieneModulo('ordenes_compra_cliente'))
+                    <x-nav-link :href="route('ordenes-compra-cliente.index')" :active="request()->routeIs('ordenes-compra-cliente.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>O/C de Clientes</span>
+                    </x-nav-link>
+                @endif
+
+                @if(auth()->user()->tieneModulo('cotizaciones'))
+                    <x-nav-link :href="route('cotizaciones.index')" :active="request()->routeIs('cotizaciones.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Cotizaciones (C001)</span>
+                    </x-nav-link>
+                @endif
+
+                @if(auth()->user()->tieneModulo('ventas'))
+                    <x-nav-link :href="route('ventas.index')" :active="request()->routeIs('ventas.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        <span>Ventas (V001)</span>
+                    </x-nav-link>
+                @endif
+            </div>
+        @endif
+
+        {{-- SECCIÓN COMPRAS --}}
+        @if(auth()->user()->tieneModulo('compras'))
+            <div class="pt-4">
+                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Abastecimiento</p>
+
+                <x-nav-link :href="route('ordenes-compra.index')" :active="request()->routeIs('ordenes-compra.*')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
                     </svg>
-                    <span>Auditoría</span>
+                    <span>O/C a Proveedor (OC01)</span>
                 </x-nav-link>
+            </div>
+        @endif
+
+        {{-- SECCIÓN ADMINISTRACIÓN --}}
+        @if(auth()->user()->tieneModulo('usuarios') || auth()->user()->tieneModulo('configuracion') || auth()->user()->tieneModulo('auditoria'))
+            <div class="pt-4">
+                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Administración</p>
+                
+                @if(auth()->user()->tieneModulo('usuarios'))
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*') || request()->routeIs('roles.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <span>Usuarios & Roles</span>
+                    </x-nav-link>
+                @endif
+
+                @if(auth()->user()->tieneModulo('configuracion'))
+                    <x-nav-link :href="route('series-documentos.index')" :active="request()->routeIs('series-documentos.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                        </svg>
+                        <span>Series & Correlativos</span>
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('configuracion.edit')" :active="request()->routeIs('configuracion.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>Configuración</span>
+                    </x-nav-link>
+                @endif
+
+                @if(auth()->user()->tieneModulo('auditoria'))
+                    <x-nav-link :href="route('auditoria.index')" :active="request()->routeIs('auditoria.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span>Auditoría</span>
+                    </x-nav-link>
+                @endif
             </div>
         @endif
     </nav>
 
-    {{-- Bottom section --}}
-    <div class="p-4 border-t border-gray-200 dark:border-gray-700/50 shrink-0">
+    {{-- Cerrar Sesión --}}
+    <div class="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700/50 shrink-0 bg-gray-50/50 dark:bg-darker-bg/30">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-rose-600 dark:hover:text-rose-400 bg-white dark:bg-gray-800/60 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-gray-200/80 dark:border-gray-700/60 rounded-xl transition-all font-semibold text-xs shadow-xs">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                 </svg>
-                <span class="text-sm font-medium">Cerrar Sesión</span>
+                <span>Cerrar Sesión</span>
             </button>
         </form>
-        <p class="text-xs text-gray-500 dark:text-gray-500 text-center mt-3">© {{ date('Y') }} Sistema ERP</p>
+        <p class="text-[9px] text-gray-400 dark:text-gray-500 text-center mt-2.5 font-mono">JHARDSYSTEX S.A.C. © {{ date('Y') }}</p>
     </div>
 </aside>

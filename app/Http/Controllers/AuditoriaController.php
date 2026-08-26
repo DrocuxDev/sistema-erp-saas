@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auditoria;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AuditoriaController extends Controller

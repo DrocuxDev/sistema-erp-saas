@@ -1,159 +1,159 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-            Editar Usuario: {{ $user->name }}
-        </h2>
-    </x-slot>
+    <div class="py-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-6 h-6 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Editar Usuario: <span class="text-sky-600">{{ $user->name }}</span>
+                </h1>
+                <p class="text-xs text-gray-500">Modifique credenciales, rol asignado o permisos particulares de módulos.</p>
+            </div>
+            <a href="{{ route('users.index') }}" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold hover:bg-gray-200">
+                ← Volver al Listado
+            </a>
+        </div>
 
-    <div class="py-12">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-card-bg overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700/50">
-                <div class="px-6 py-8">
-                    <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-6">
-                        @csrf
-                        @method('PATCH')
+        <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-6">
+            @csrf
+            @method('PUT')
 
-                        <div>
-                            <label for="name" class="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-2">
-                                Nombre Completo
-                            </label>
-                            <input
-                                id="name"
-                                type="text"
-                                name="name"
-                                value="{{ old('name', $user->name) }}"
-                                required
-                                autofocus
-                                class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-primary focus:ring-2 focus:ring-purple-primary/20 transition-all"
-                            />
-                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <!-- 1. Datos Personales y Credenciales -->
+            <div class="bg-white dark:bg-card-bg rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-6 space-y-4">
+                <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-700/60 pb-2">
+                    1. Información del Usuario & Credenciales
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Nombre Completo (Empleado) *</label>
+                        <input type="text" name="name" value="{{ old('name', $user->name) }}" required 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        <x-input-error :messages="$errors->get('name')" class="mt-1" />
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Correo Electrónico (Login) *</label>
+                        <input type="email" name="email" value="{{ old('email', $user->email) }}" required 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        <x-input-error :messages="$errors->get('email')" class="mt-1" />
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Alias / Nombre de Usuario</label>
+                        <input type="text" name="username" value="{{ old('username', $user->username) }}" 
+                               placeholder="Ej. JPEREZ@EMPRESA"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        <x-input-error :messages="$errors->get('username')" class="mt-1" />
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Punto de Emisión *</label>
+                        <input type="text" name="punto_emision" value="{{ old('punto_emision', $user->punto_emision ?: 'OFICINA') }}" required 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white uppercase focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        <x-input-error :messages="$errors->get('punto_emision')" class="mt-1" />
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Nueva Contraseña (Dejar en blanco para mantener actual)</label>
+                        <input type="password" name="password" 
+                               placeholder="••••••••"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        <x-input-error :messages="$errors->get('password')" class="mt-1" />
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Confirmar Nueva Contraseña</label>
+                        <input type="password" name="password_confirmation" 
+                               placeholder="Repetir nueva contraseña"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center gap-6">
+                    @if(!$user->isSuperAdmin())
+                        <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-700 dark:text-gray-300">
+                            <input type="checkbox" name="activo" value="1" {{ old('activo', $user->activo) ? 'checked' : '' }} 
+                                   class="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500">
+                            <span>Usuario Activo (Permitir inicio de sesión)</span>
+                        </label>
+                    @else
+                        <div class="text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                            <span>👑 Usuario SuperAdmin Base (Siempre Activo e Inmutable)</span>
                         </div>
+                    @endif
 
-                        <div>
-                            <label for="email" class="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-2">
-                                Correo Electrónico
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value="{{ old('email', $user->email) }}"
-                                required
-                                class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-primary focus:ring-2 focus:ring-purple-primary/20 transition-all"
-                            />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
-
-                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-                            <p class="text-sm text-blue-800 dark:text-blue-300">
-                                <strong>Nota:</strong> Deja estos campos en blanco si no deseas cambiar la contraseña.
-                            </p>
-                        </div>
-
-                        <div>
-                            <label for="password" class="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-2">
-                                Nueva Contraseña (opcional)
-                            </label>
-                            <div class="relative">
-                                <input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    placeholder="••••••••"
-                                    class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-4 py-3 pr-11 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-primary focus:ring-2 focus:ring-purple-primary/20 transition-all"
-                                />
-                                <button
-                                    type="button"
-                                    id="toggle-password"
-                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-                                >
-                                    <svg id="eye-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <svg id="eye-closed" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <label for="password_confirmation" class="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-2">
-                                Confirmar Nueva Contraseña (opcional)
-                            </label>
-                            <div class="relative">
-                                <input
-                                    id="password_confirmation"
-                                    type="password"
-                                    name="password_confirmation"
-                                    placeholder="••••••••"
-                                    class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-4 py-3 pr-11 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-primary focus:ring-2 focus:ring-purple-primary/20 transition-all"
-                                />
-                                <button
-                                    type="button"
-                                    id="toggle-confirm"
-                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
-                                >
-                                    <svg id="eye-open-confirm" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <svg id="eye-closed-confirm" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <label for="rol" class="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-2">
-                                Rol
-                            </label>
-                            <select
-                                id="rol"
-                                name="rol"
-                                required
-                                class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-purple-primary focus:ring-2 focus:ring-purple-primary/20 transition-all"
-                            >
-                                <option value="administrador" {{ old('rol', $user->rol) === 'administrador' ? 'selected' : '' }}>Administrador</option>
-                                <option value="trabajador" {{ old('rol', $user->rol) === 'trabajador' ? 'selected' : '' }}>Trabajador</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('rol')" class="mt-2" />
-                        </div>
-
-                        <div class="flex gap-4 pt-6">
-                            <button
-                                type="submit"
-                                class="flex-1 rounded-lg bg-purple-primary px-4 py-3 text-base font-semibold text-white hover:bg-purple-light focus:outline-none focus:ring-2 focus:ring-purple-primary focus:ring-offset-2 transition-all"
-                            >
-                                Guardar Cambios
-                            </button>
-                            <a href="{{ route('users.index') }}" class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-center text-base font-semibold text-gray-900 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
-                                Cancelar
-                            </a>
-                        </div>
-                    </form>
+                    @if(auth()->user()->isSuperAdmin() && $user->id !== auth()->id())
+                        <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-amber-800">
+                            <input type="checkbox" name="is_superadmin" value="1" {{ old('is_superadmin', $user->isSuperAdmin()) ? 'checked' : '' }} 
+                                   class="w-4 h-4 text-amber-600 rounded border-amber-300 focus:ring-amber-500">
+                            <span>Rango SuperAdmin</span>
+                        </label>
+                    @endif
                 </div>
             </div>
-        </div>
+
+            <!-- 2. Asignación de Rol Principal -->
+            <div class="bg-white dark:bg-card-bg rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-6 space-y-4">
+                <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-700/60 pb-2">
+                    2. Asignación de Rol
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    @foreach($roles as $r)
+                        <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-500 cursor-pointer transition-all bg-gray-50/50 dark:bg-darker-bg/50">
+                            <input type="radio" name="rol_id" value="{{ $r->id }}" {{ old('rol_id', $user->rol_id) == $r->id ? 'checked' : '' }}
+                                   class="mt-0.5 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            <div>
+                                <div class="text-xs font-bold text-gray-900 dark:text-white uppercase">{{ $r->nombre }}</div>
+                                <div class="text-[11px] text-gray-500 leading-tight mt-0.5">{{ $r->descripcion ?: 'Acceso estándar' }}</div>
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- 3. Asignación Granular de Módulos (Opcional) -->
+            <div class="bg-white dark:bg-card-bg rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700/60 pb-2">
+                    <div>
+                        <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                            3. Permisos Personalizados por Módulo (Excepciones)
+                        </h2>
+                        <p class="text-[11px] text-gray-500">Modifique los módulos concedidos específicamente para este usuario.</p>
+                    </div>
+                </div>
+                
+                <input type="hidden" name="modulos_personalizados" value="1">
+
+                <div class="space-y-4">
+                    @foreach($modulos as $categoria => $mods)
+                        <div>
+                            <span class="text-[11px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-wider">{{ $categoria }}</span>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 mt-2">
+                                @foreach($mods as $m)
+                                    @php
+                                        $marcado = in_array($m->id, old('modulos', $usuarioModulos));
+                                    @endphp
+                                    <label class="inline-flex items-center gap-2 p-2 rounded bg-gray-50 dark:bg-darker-bg border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-800 dark:text-gray-200 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800">
+                                        <input type="checkbox" name="modulos[]" value="{{ $m->id }}" {{ $marcado ? 'checked' : '' }}
+                                               class="w-3.5 h-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                        <span>{{ $m->nombre }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit" class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-bold text-xs sm:text-sm shadow-sm transition-colors">
+                    Actualizar Usuario y Permisos
+                </button>
+                <a href="{{ route('users.index') }}" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-lg font-semibold text-xs sm:text-sm transition-colors">
+                    Cancelar
+                </a>
+            </div>
+        </form>
     </div>
-
-    <script>
-        ['toggle-password', 'toggle-confirm'].forEach(btnId => {
-            const btn = document.getElementById(btnId);
-            const input = btn.previousElementSibling;
-            const eyeOpen = document.getElementById(btnId === 'toggle-password' ? 'eye-open' : 'eye-open-confirm');
-            const eyeClosed = document.getElementById(btnId === 'toggle-password' ? 'eye-closed' : 'eye-closed-confirm');
-
-            btn.addEventListener('click', () => {
-                const isHidden = input.type === 'password';
-                input.type = isHidden ? 'text' : 'password';
-                eyeOpen.classList.toggle('hidden', isHidden);
-                eyeClosed.classList.toggle('hidden', !isHidden);
-            });
-        });
-    </script>
 </x-app-layout>

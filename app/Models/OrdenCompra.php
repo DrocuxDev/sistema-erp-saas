@@ -15,17 +15,39 @@ class OrdenCompra extends Model
     protected $fillable = [
         'proveedor_id',
         'usuario_id',
+        'serie',
+        'correlativo',
+        'codigo',
         'fecha',
+        'subtotal',
+        'igv',
+        'total',
         'estado',
         'observaciones',
+        'forma_pago',
+        'plazo_entrega',
+        'lugar_entrega',
     ];
 
     protected function casts(): array
     {
         return [
             'fecha' => 'date',
+            'correlativo' => 'integer',
+            'subtotal' => 'decimal:2',
+            'igv' => 'decimal:2',
+            'total' => 'decimal:2',
             'created_at' => 'datetime',
         ];
+    }
+
+    public function getCodigoFormateadoAttribute(): string
+    {
+        if (!empty($this->codigo)) {
+            return $this->codigo;
+        }
+        $serie = $this->serie ?: 'OC01';
+        return $serie . '-' . str_pad($this->correlativo ?: 1, 6, '0', STR_PAD_LEFT);
     }
 
     public function proveedor(): BelongsTo

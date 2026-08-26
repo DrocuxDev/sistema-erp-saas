@@ -18,7 +18,7 @@
 
             <div class="bg-white dark:bg-card-bg overflow-hidden shadow-md rounded-lg border border-gray-200 dark:border-gray-700/50">
                 <!-- Header Info -->
-                <div class="bg-gradient-to-r from-purple-primary to-purple-light px-8 py-8 text-white">
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-8 text-white">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div>
                             <p class="text-sm font-semibold text-white/80">SKU</p>
@@ -50,19 +50,19 @@
                 <!-- Tabs Navigation -->
                 <div class="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
                     <div class="px-8 flex space-x-6 whitespace-nowrap">
-                        <button class="tab-btn py-4 px-2 border-b-2 border-purple-primary text-purple-primary font-semibold text-sm" onclick="showTab('detalles', this)">
+                        <button class="tab-btn py-4 px-2 border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-bold text-xs uppercase tracking-wider" onclick="showTab('detalles', this)">
                             DETALLES
                         </button>
-                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-sm" onclick="showTab('inventario', this)">
+                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('inventario', this)">
                             INVENTARIO
                         </button>
-                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-sm" onclick="showTab('opciones', this)">
+                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('opciones', this)">
                             OPCIONES
                         </button>
-                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-sm" onclick="showTab('proveedores', this)">
+                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('proveedores', this)">
                             PROVEEDORES ({{ $producto->productoProveedores->count() }})
                         </button>
-                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-sm" onclick="showTab('presentaciones', this)">
+                        <button class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('presentaciones', this)">
                             PRESENTACIONES ({{ $producto->presentacionesCompra->count() }})
                         </button>
                     </div>
@@ -271,7 +271,7 @@
 
                 <!-- Action Buttons -->
                 <div class="px-8 py-6 bg-gray-50 dark:bg-darker-bg border-t border-gray-200 dark:border-gray-700 flex gap-4">
-                    <a href="{{ route('productos.edit', $producto) }}" class="flex-1 rounded-lg bg-purple-primary px-6 py-3 text-center text-base font-semibold text-white hover:bg-purple-light transition-all">
+                    <a href="{{ route('productos.edit', $producto) }}" class="flex-1 rounded-lg bg-cyan-600 px-6 py-3 text-center text-base font-semibold text-white hover:bg-cyan-500 transition-all shadow-sm">
                         Editar Producto
                     </a>
                     <a href="{{ route('productos.index') }}" class="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-6 py-3 text-center text-base font-semibold text-gray-900 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">
@@ -284,20 +284,14 @@
 
     <script>
         function showTab(tabName, element) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            // Show selected tab
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.getElementById(tabName).classList.remove('hidden');
-            
-            // Update button styles
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('border-purple-primary', 'text-purple-primary');
-                btn.classList.add('border-transparent', 'text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-gray-200');
+                btn.classList.remove('border-cyan-500', 'text-cyan-600', 'dark:text-cyan-400', 'font-bold');
+                btn.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400', 'font-semibold');
             });
-            element.classList.remove('border-transparent', 'text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-gray-200');
-            element.classList.add('border-purple-primary', 'text-purple-primary');
+            element.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400', 'font-semibold');
+            element.classList.add('border-cyan-500', 'text-cyan-600', 'dark:text-cyan-400', 'font-bold');
         }
     </script>
 </x-app-layout>

@@ -14,6 +14,10 @@ class CotizacionResumen extends Model
     protected $fillable = [
         'cotizacion_id',
         'configuracion_id',
+        'pct_igv',
+        'pct_retencion',
+        'pct_comision_venta',
+        'pct_comision_ganancia',
         'subtotal',
         'igv',
         'retencion',
@@ -27,6 +31,10 @@ class CotizacionResumen extends Model
     protected function casts(): array
     {
         return [
+            'pct_igv' => 'decimal:2',
+            'pct_retencion' => 'decimal:2',
+            'pct_comision_venta' => 'decimal:2',
+            'pct_comision_ganancia' => 'decimal:2',
             'subtotal' => 'decimal:2',
             'igv' => 'decimal:2',
             'retencion' => 'decimal:2',

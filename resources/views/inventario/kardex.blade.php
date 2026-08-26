@@ -1,14 +1,24 @@
 <x-app-layout>
     <div class="p-6">
         <!-- Encabezado -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Inventario — Kardex</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Historial de movimientos de stock</p>
+                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    <span>Maestros</span>
+                    <span>/</span>
+                    <span class="text-gray-900 dark:text-white">Inventario & Kardex</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                    </span>
+                    Kardex & Control de Inventario
+                </h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Trazabilidad física de entradas por compras, salidas por ventas y ajustes manuales.</p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('inventario.ajuste.create') }}" class="px-4 py-2 bg-purple-primary text-white rounded-md hover:bg-purple-light transition-colors flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('inventario.ajuste.create') }}" class="w-full sm:w-auto px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Nuevo Ajuste Manual

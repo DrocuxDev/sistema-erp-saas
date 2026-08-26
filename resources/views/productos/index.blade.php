@@ -3,12 +3,22 @@
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Productos</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Catálogo e inventario de productos</p>
+                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    <span>Maestros</span>
+                    <span>/</span>
+                    <span class="text-gray-900 dark:text-white">Productos</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </span>
+                    Catálogo de Productos y Precios
+                </h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Control de artículos, precios base de compra/venta y alertas de stock mínimo.</p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('productos.create') }}" class="w-full sm:w-auto px-4 py-2 bg-purple-primary text-white rounded-lg hover:bg-purple-light transition-colors flex items-center justify-center gap-2 font-medium text-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('productos.create') }}" class="w-full sm:w-auto px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Nuevo Producto

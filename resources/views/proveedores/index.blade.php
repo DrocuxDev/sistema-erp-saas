@@ -3,12 +3,22 @@
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Proveedores</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Listado de proveedores registrados</p>
+                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    <span>Maestros</span>
+                    <span>/</span>
+                    <span class="text-gray-900 dark:text-white">Proveedores</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </span>
+                    Catálogo de Proveedores & Distribuidores
+                </h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Gestión de empresas mayoristas, distribuidores autorizados y canales de suministro.</p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('proveedores.create') }}" class="w-full sm:w-auto px-4 py-2 bg-purple-primary text-white rounded-lg hover:bg-purple-light transition-colors flex items-center justify-center gap-2 font-medium text-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('proveedores.create') }}" class="w-full sm:w-auto px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Nuevo Proveedor

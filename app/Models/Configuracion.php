@@ -13,6 +13,18 @@ class Configuracion extends Model
 
     protected $fillable = [
         'nombre',
+        'razon_social',
+        'ruc',
+        'direccion',
+        'telefono',
+        'email',
+        'sitio_web',
+        'cuentas_bancarias',
+        'plazo_entrega_default',
+        'forma_pago_default',
+        'validez_oferta_default',
+        'logistica_default',
+        'pdf_template_cotizacion',
         'pct_igv',
         'pct_retencion',
         'pct_comision_venta',

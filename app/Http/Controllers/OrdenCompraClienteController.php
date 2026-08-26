@@ -108,4 +108,13 @@ class OrdenCompraClienteController extends Controller
         return redirect()->route('ordenes-compra-cliente.index')
             ->with('success', 'Orden de compra eliminada.');
     }
+
+    public function archivo(OrdenCompraCliente $ordenesCompraCliente)
+    {
+        if (!$ordenesCompraCliente->archivo || !Storage::disk('public')->exists($ordenesCompraCliente->archivo)) {
+            abort(404, 'El archivo adjunto no existe o fue eliminado del servidor.');
+        }
+
+        return Storage::disk('public')->response($ordenesCompraCliente->archivo);
+    }
 }
