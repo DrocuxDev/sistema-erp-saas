@@ -1,72 +1,71 @@
 <x-app-layout>
-    <div class="py-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="page-container py-6 space-y-6">
         
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <svg class="w-6 h-6 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     Editar Usuario: <span class="text-sky-600">{{ $user->name }}</span>
                 </h1>
                 <p class="text-xs text-gray-500">Modifique credenciales, rol asignado o permisos particulares de módulos.</p>
             </div>
             <a href="{{ route('users.index') }}" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold hover:bg-gray-200">
-                ← Volver al Listado
+                Volver al listado
             </a>
         </div>
 
-        <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-6">
+        <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-6" data-dirty-check>
             @csrf
             @method('PUT')
 
             <!-- 1. Datos Personales y Credenciales -->
             <div class="bg-white dark:bg-card-bg rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-6 space-y-4">
-                <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-700/60 pb-2">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700/60 pb-2">
                     1. Información del Usuario & Credenciales
                 </h2>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
-                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Nombre Completo (Empleado) *</label>
+                        <label class="form-label">Nombre Completo (Empleado) *</label>
                         <input type="text" name="name" value="{{ old('name', $user->name) }}" required 
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                               class="form-input">
                         <x-input-error :messages="$errors->get('name')" class="mt-1" />
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Correo Electrónico (Login) *</label>
+                        <label class="form-label">Correo Electrónico (Login) *</label>
                         <input type="email" name="email" value="{{ old('email', $user->email) }}" required 
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                               class="form-input">
                         <x-input-error :messages="$errors->get('email')" class="mt-1" />
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Alias / Nombre de Usuario</label>
+                        <label class="form-label">Alias / Nombre de Usuario</label>
                         <input type="text" name="username" value="{{ old('username', $user->username) }}" 
                                placeholder="Ej. JPEREZ@EMPRESA"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                               class="form-input">
                         <x-input-error :messages="$errors->get('username')" class="mt-1" />
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Punto de Emisión *</label>
+                        <label class="form-label">Punto de Emisión *</label>
                         <input type="text" name="punto_emision" value="{{ old('punto_emision', $user->punto_emision ?: 'OFICINA') }}" required 
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white uppercase focus:ring-1 focus:ring-blue-500 focus:outline-none">
                         <x-input-error :messages="$errors->get('punto_emision')" class="mt-1" />
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Nueva Contraseña (Dejar en blanco para mantener actual)</label>
+                        <label class="form-label">Nueva Contraseña (Dejar en blanco para mantener actual)</label>
                         <input type="password" name="password" 
                                placeholder="••••••••"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                               class="form-input">
                         <x-input-error :messages="$errors->get('password')" class="mt-1" />
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Confirmar Nueva Contraseña</label>
+                        <label class="form-label">Confirmar Nueva Contraseña</label>
                         <input type="password" name="password_confirmation" 
                                placeholder="Repetir nueva contraseña"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-darker-bg text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                               class="form-input">
                     </div>
                 </div>
 
@@ -95,7 +94,7 @@
 
             <!-- 2. Asignación de Rol Principal -->
             <div class="bg-white dark:bg-card-bg rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-6 space-y-4">
-                <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider border-b border-gray-100 dark:border-gray-700/60 pb-2">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700/60 pb-2">
                     2. Asignación de Rol
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -116,7 +115,7 @@
             <div class="bg-white dark:bg-card-bg rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700/60 pb-2">
                     <div>
-                        <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                        <h2 class="text-sm font-semibold text-gray-900 dark:text-white">
                             3. Permisos Personalizados por Módulo (Excepciones)
                         </h2>
                         <p class="text-[11px] text-gray-500">Modifique los módulos concedidos específicamente para este usuario.</p>
@@ -128,7 +127,7 @@
                 <div class="space-y-4">
                     @foreach($modulos as $categoria => $mods)
                         <div>
-                            <span class="text-[11px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-wider">{{ $categoria }}</span>
+                            <span class="text-xs font-semibold text-cyan-600 dark:text-cyan-400">{{ $categoria }}</span>
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 mt-2">
                                 @foreach($mods as $m)
                                     @php

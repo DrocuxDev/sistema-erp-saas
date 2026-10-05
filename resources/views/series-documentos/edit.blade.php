@@ -1,9 +1,9 @@
 <x-app-layout>
-    <div class="p-4 sm:p-6 max-w-4xl mx-auto space-y-6">
+    <div class="page-container py-4 sm:py-6 space-y-6">
 
         <div class="flex items-center justify-between">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <a href="{{ route('series-documentos.index') }}" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">Series & Correlativos</a>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">Editar Serie {{ $serie->serie }}</span>
@@ -16,12 +16,12 @@
                 </h1>
             </div>
             <a href="{{ route('series-documentos.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-semibold transition-colors">
-                ← Volver al Listado
+                Volver al listado
             </a>
         </div>
 
         <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-6">
-            <form method="POST" action="{{ route('series-documentos.update', $serie) }}" class="space-y-6">
+            <form method="POST" action="{{ route('series-documentos.update', $serie) }}" class="space-y-6" data-dirty-check>
                 @csrf
                 @method('PUT')
 
@@ -29,11 +29,11 @@
                     
                     {{-- Tipo de Documento --}}
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label class="form-label-xs">
                             Tipo de Documento <span class="text-rose-500">*</span>
                         </label>
                         <select name="tipo_documento" required
-                                class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                                class="form-input">
                             @foreach($tipos as $k => $lbl)
                                 <option value="{{ $k }}" {{ old('tipo_documento', $serie->tipo_documento) === $k ? 'selected' : '' }}>
                                     {{ $lbl }} ({{ $k }})
@@ -45,7 +45,7 @@
 
                     {{-- Prefijo / Serie --}}
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label class="form-label-xs">
                             Prefijo de Serie <span class="text-rose-500">*</span>
                         </label>
                         <input type="text" name="serie" value="{{ old('serie', $serie->serie) }}" required
@@ -55,7 +55,7 @@
 
                     {{-- Correlativo Actual --}}
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label class="form-label-xs">
                             Correlativo Actual (Último emitido) <span class="text-rose-500">*</span>
                         </label>
                         <input type="number" name="correlativo_actual" value="{{ old('correlativo_actual', $serie->correlativo_actual) }}" required min="0"
@@ -66,11 +66,11 @@
 
                     {{-- Longitud de Relleno --}}
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label class="form-label-xs">
                             Ceros de Relleno (Longitud) <span class="text-rose-500">*</span>
                         </label>
                         <select name="longitud_correlativo" required
-                                class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                                class="form-input">
                             <option value="6" {{ old('longitud_correlativo', $serie->longitud_correlativo) == 6 ? 'selected' : '' }}>6 dígitos (ej: V001-000001)</option>
                             <option value="8" {{ old('longitud_correlativo', $serie->longitud_correlativo) == 8 ? 'selected' : '' }}>8 dígitos (ej: F001-00000001)</option>
                             <option value="4" {{ old('longitud_correlativo', $serie->longitud_correlativo) == 4 ? 'selected' : '' }}>4 dígitos (ej: C001-0001)</option>
@@ -80,11 +80,11 @@
 
                     {{-- Descripción --}}
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label class="form-label-xs">
                             Descripción / Propósito de la Serie
                         </label>
                         <input type="text" name="descripcion" value="{{ old('descripcion', $serie->descripcion) }}"
-                               class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                               class="form-input">
                         @error('descripcion') <p class="text-rose-500 text-[11px] mt-1">{{ $message }}</p> @enderror
                     </div>
 

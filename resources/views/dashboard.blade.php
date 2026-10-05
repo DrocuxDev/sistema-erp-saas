@@ -2,12 +2,12 @@
     <x-slot name="header">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider mb-1">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Panel Ejecutivo de Inteligencia Comercial</span>
+                <div class="flex items-center gap-2 text-xs font-medium text-cyan-700 dark:text-cyan-400 mb-1">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>Panel Ejecutivo de Operaciones y Ventas</span>
                 </div>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white flex items-center gap-3">
-                    Dashboard de Ventas y Operaciones
+                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-3">
+                    Panel comercial
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Monitoreo en tiempo real de facturación, márgenes, rentabilidad, cotizaciones y stock.
@@ -16,7 +16,7 @@
 
             <!-- Filtros de Fecha / Periodo -->
             <form method="GET" action="{{ route('dashboard') }}" id="filtro-form" class="flex flex-wrap items-center gap-2">
-                <div class="flex items-center bg-white dark:bg-card-bg p-1 rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-sm">
+                <div class="flex items-center bg-white dark:bg-card-bg p-1 rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-2xs">
                     <select name="anio" onchange="document.getElementById('filtro-form').submit()"
                             class="bg-transparent border-0 text-xs font-bold text-gray-800 dark:text-gray-200 focus:ring-0 cursor-pointer py-1.5 pl-3 pr-8">
                         @foreach($aniosDisponibles as $a)
@@ -37,11 +37,11 @@
 
                 <!-- Botones de Acceso Rápido -->
                 <a href="{{ route('dashboard', ['rango' => 'este_mes']) }}"
-                   class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all {{ $rangoRapido === 'este_mes' || ($mes == (int)date('m') && $anio == (int)date('Y')) ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20' : 'bg-white dark:bg-card-bg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80 hover:bg-gray-50' }}">
+                   class="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors {{ $rangoRapido === 'este_mes' || ($mes == (int)date('m') && $anio == (int)date('Y')) ? 'bg-slate-900 dark:bg-cyan-600 text-white' : 'bg-white dark:bg-card-bg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80 hover:bg-gray-50 dark:hover:bg-slate-800' }}">
                     Este Mes
                 </a>
                 <a href="{{ route('dashboard', ['rango' => 'este_anio']) }}"
-                   class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all {{ $rangoRapido === 'este_anio' || (is_null($mes) && $anio == (int)date('Y')) ? 'bg-cyan-600 text-white shadow-md shadow-cyan-600/20' : 'bg-white dark:bg-card-bg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80 hover:bg-gray-50' }}">
+                   class="px-3 py-1.5 rounded-xl text-xs font-medium transition-colors {{ $rangoRapido === 'este_anio' || (is_null($mes) && $anio == (int)date('Y')) ? 'bg-slate-900 dark:bg-cyan-600 text-white' : 'bg-white dark:bg-card-bg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80 hover:bg-gray-50 dark:hover:bg-slate-800' }}">
                     Año {{ date('Y') }}
                 </a>
             </form>
@@ -49,93 +49,82 @@
     </x-slot>
 
     <div class="py-6 sm:py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="page-container space-y-6">
 
-            <!-- 1. HEADER DE MÉTRICAS CLAVE (KPIs ESTILO PLANILLA EXCEL / BUSINESS INTELLIGENCE) -->
+            <!-- 1. HEADER DE MÉTRICAS CLAVE (KPIs EJECUTIVOS CON JERARQUÍA REAL) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 
-                <!-- KPI 1: VENTAS TOTALES -->
-                <div class="relative overflow-hidden bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm hover:shadow-md transition-all">
+                <!-- KPI 1: VENTAS TOTALES (Métrica principal ancla) -->
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">
-                                Ventas Totales
-                            </span>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1 font-mono">
-                                S/ {{ number_format($totalVentas, 2) }}
-                            </div>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center text-rose-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        </div>
+                        <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 block">
+                            Ventas Totales Facturadas
+                        </span>
+                        <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                            Serie V001
+                        </span>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white mt-2 font-mono">
+                        S/ {{ number_format($totalVentas, 2) }}
                     </div>
                     <div class="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700/60 pt-2.5">
-                        <span class="font-bold text-gray-800 dark:text-gray-200">{{ $cantidadVentas }}</span> ventas concretadas
-                        <span class="text-gray-300 dark:text-gray-600">•</span>
-                        <span>Serie V001</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ $cantidadVentas }}</span>
+                        <span>transacciones concluidas</span>
                     </div>
                 </div>
 
                 <!-- KPI 2: MARGEN BRUTO S/ -->
-                <div class="relative overflow-hidden bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm hover:shadow-md transition-all">
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider block">
-                                Margen S/ (Ganancia)
-                            </span>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1 font-mono">
-                                S/ {{ number_format($gananciaVentas, 2) }}
-                            </div>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 border border-cyan-200 dark:border-cyan-800/60 flex items-center justify-center text-cyan-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
+                        <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 block">
+                            Margen Bruto (Ganancia)
+                        </span>
+                        <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800/60">
+                            Utilidad
+                        </span>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-bold tracking-tight text-cyan-600 dark:text-cyan-400 mt-2 font-mono">
+                        S/ {{ number_format($gananciaVentas, 2) }}
                     </div>
                     <div class="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700/60 pt-2.5">
-                        <span>Costo Compra: <strong class="text-gray-800 dark:text-gray-200 font-mono">S/ {{ number_format(max(0, $subtotalVentas - $gananciaVentas), 2) }}</strong></span>
+                        <span>Costo de Adquisición: <strong class="text-gray-800 dark:text-gray-200 font-mono">S/ {{ number_format(max(0, $subtotalVentas - $gananciaVentas), 2) }}</strong></span>
                     </div>
                 </div>
 
                 <!-- KPI 3: MARGEN % / RENTABILIDAD -->
-                <div class="relative overflow-hidden bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm hover:shadow-md transition-all">
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                                Margen Promedio %
-                            </span>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 font-mono">
-                                {{ number_format($margenPct, 1) }}%
-                            </div>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center text-emerald-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                        </div>
+                        <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 block">
+                            Rentabilidad Comercial
+                        </span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold {{ $margenPct >= 15 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60' }}">
+                            {{ $margenPct >= 15 ? 'Óptima' : 'Estándar' }}
+                        </span>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400 mt-2 font-mono">
+                        {{ number_format($margenPct, 1) }}%
                     </div>
                     <div class="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700/60 pt-2.5">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $margenPct >= 15 ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' }}">
-                            {{ $margenPct >= 15 ? 'Rentabilidad Óptima' : 'Margen Estándar' }}
-                        </span>
+                        <span>Margen promedio ponderado</span>
                     </div>
                 </div>
 
-                <!-- KPI 4: CONVERSIÓN & COTIZACIONES -->
-                <div class="relative overflow-hidden bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm hover:shadow-md transition-all">
+                <!-- KPI 4: CONVERSIÓN & COTIZACIONES (Sin púrpura de IA) -->
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider block">
-                                Conversión Cotizaciones
-                            </span>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1 font-mono">
-                                {{ number_format($tasaConversion, 1) }}%
-                            </div>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800/60 flex items-center justify-center text-purple-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        </div>
+                        <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 block">
+                            Conversión de Cotizaciones
+                        </span>
+                        <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            C001 V001
+                        </span>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white mt-2 font-mono">
+                        {{ number_format($tasaConversion, 1) }}%
                     </div>
                     <div class="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700/60 pt-2.5">
-                        <span>{{ $cotizacionesPendientes }} pendientes</span>
-                        <span class="text-cyan-600 dark:text-cyan-400 font-semibold">{{ $totalCotizaciones }} emitidas</span>
+                        <span>{{ $cotizacionesPendientes }} en curso</span>
+                        <span class="text-gray-700 dark:text-gray-300 font-medium">{{ $totalCotizaciones }} registradas</span>
                     </div>
                 </div>
             </div>
@@ -186,8 +175,8 @@
                             </h3>
                             <p class="text-xs text-gray-500">Bienes con mayor volumen y valor monetario comercializado</p>
                         </div>
-                        <a href="{{ route('productos.index') }}" class="text-xs text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">
-                            Ver catálogo →
+                        <a href="{{ route('productos.index') }}" class="text-xs text-cyan-700 dark:text-cyan-400 font-medium hover:underline">
+                            Ver catálogo
                         </a>
                     </div>
                     <div class="h-64 sm:h-72 w-full relative">
@@ -196,13 +185,13 @@
                 </div>
 
                 <!-- GRÁFICO 4: DISTRIBUCIÓN POR TIPO DE NEGOCIO (PIE) -->
-                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm space-y-4">
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs space-y-4">
                     <div class="border-b border-gray-100 dark:border-gray-700/60 pb-3">
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
                             Líneas de Negocio
                         </h3>
-                        <p class="text-xs text-gray-500">Hardware / Equipamiento vs Servicios TI</p>
+                        <p class="text-xs text-gray-500">Equipamiento y servicios TI</p>
                     </div>
                     <div class="h-64 sm:h-72 w-full relative flex items-center justify-center">
                         <canvas id="chartLineasNegocio"></canvas>
@@ -210,7 +199,7 @@
                 </div>
 
                 <!-- GRÁFICO 5: EVOLUCIÓN DIARIA DE VENTAS (ÁREA CHART) -->
-                <div class="lg:col-span-3 bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm space-y-4">
+                <div class="lg:col-span-3 bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs space-y-4">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-100 dark:border-gray-700/60 pb-3">
                         <div>
                             <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -232,13 +221,13 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- TOP CLIENTES -->
-                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm space-y-4">
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs space-y-4">
                     <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700/60 pb-3">
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
                             Top Clientes del Año
                         </h3>
-                        <a href="{{ route('clientes.index') }}" class="text-xs text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Ver todos</a>
+                        <a href="{{ route('clientes.index') }}" class="text-xs text-cyan-700 dark:text-cyan-400 font-medium hover:underline">Ver directorio</a>
                     </div>
                     <div class="space-y-3">
                         @php $maxComprado = $topClientes->max('total_comprado') ?: 1; @endphp
@@ -248,7 +237,7 @@
                             @endphp
                             <div class="space-y-1 text-xs">
                                 <div class="flex justify-between items-center">
-                                    <span class="font-bold text-gray-800 dark:text-gray-200 truncate max-w-[200px]">
+                                    <span class="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[200px]">
                                         {{ $idx + 1 }}. {{ $tc->cliente->nombre ?? 'Cliente #' . $tc->cliente_id }}
                                     </span>
                                     <span class="font-mono font-bold text-gray-900 dark:text-white">
@@ -256,7 +245,7 @@
                                     </span>
                                 </div>
                                 <div class="w-full bg-gray-100 dark:bg-gray-700/60 h-2 rounded-full overflow-hidden">
-                                    <div class="bg-gradient-to-r from-cyan-500 to-emerald-500 h-full rounded-full" style="width: {{ $porcentaje }}%"></div>
+                                    <div class="bg-cyan-600 dark:bg-cyan-500 h-full rounded-full" style="width: {{ $porcentaje }}%"></div>
                                 </div>
                             </div>
                         @empty
@@ -265,14 +254,14 @@
                     </div>
                 </div>
 
-                <!-- ALERTAS DE STOCK CRÍTICO -->
-                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700/60 pb-3">
-                        <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                            Alertas de Stock Bajo
+                <!-- ALERTAS DE STOCK CRÍTICO (Tratamiento diferenciado de alerta operativa) -->
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-rose-200 dark:border-rose-900/40 shadow-2xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-rose-100 dark:border-rose-900/30 pb-3">
+                        <h3 class="text-sm font-bold text-rose-950 dark:text-rose-200 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                            Alertas de existencias bajas
                         </h3>
-                        <a href="{{ route('inventario.kardex') }}" class="text-xs text-rose-600 dark:text-rose-400 font-semibold hover:underline">Kardex →</a>
+                        <a href="{{ route('inventario.kardex') }}" class="text-xs text-rose-700 dark:text-rose-300 font-medium hover:underline">Ver Kardex</a>
                     </div>
                     <div class="space-y-2.5">
                         @forelse($productosStockBajo as $pb)
@@ -295,13 +284,13 @@
                 </div>
 
                 <!-- ÚLTIMAS VENTAS REGISTRADAS -->
-                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-sm space-y-4">
+                <div class="bg-white dark:bg-card-bg rounded-2xl p-5 border border-gray-200/90 dark:border-gray-700/70 shadow-2xs space-y-4">
                     <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700/60 pb-3">
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                             Últimas Ventas Emitidas
                         </h3>
-                        <a href="{{ route('ventas.index') }}" class="text-xs text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Ver todas →</a>
+                        <a href="{{ route('ventas.index') }}" class="text-xs text-cyan-700 dark:text-cyan-400 font-medium hover:underline">Ver todas</a>
                     </div>
                     <div class="space-y-2.5">
                         @forelse($ultimasVentas as $uv)
@@ -407,8 +396,8 @@
                                 '#06B6D4', // Cyan Neón
                                 '#10B981', // Emerald
                                 '#F59E0B', // Amber
-                                '#8B5CF6', // Purple
-                                '#EC4899', // Pink
+                                '#3B82F6', // Blue
+                                '#64748B', // Slate
                             ],
                             borderWidth: 2,
                             borderColor: isDark ? '#111C3A' : '#FFFFFF'
@@ -491,7 +480,7 @@
                 new Chart(ctxLineas, {
                     type: 'pie',
                     data: {
-                        labels: ['Equipamiento / Hardware', 'Servicios TI'],
+                        labels: ['Equipamiento', 'Servicios TI'],
                         datasets: [{
                             data: hasData ? [countProd, countServ] : [70, 30],
                             backgroundColor: ['#10B981', '#F43F5E'],

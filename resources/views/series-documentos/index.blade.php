@@ -4,15 +4,12 @@
         <!-- Encabezado de Navegación y Título -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <a href="{{ route('configuracion.edit') }}" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">Configuración</a>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">Series & Correlativos</span>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
-                    </span>
                     Control de Series y Correlativos
                 </h1>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -86,7 +83,7 @@
         <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-xs text-left">
-                    <thead class="bg-slate-900 dark:bg-slate-950 text-white uppercase text-[10px] tracking-wider font-semibold border-b border-gray-200 dark:border-gray-800">
+                    <thead class="bg-slate-900 dark:bg-slate-950 text-white text-xs font-semibold border-b border-gray-200 dark:border-gray-800">
                         <tr>
                             <th class="px-4 py-3.5">Tipo de Documento</th>
                             <th class="px-4 py-3.5">Serie / Prefijo</th>
@@ -144,19 +141,13 @@
                                 </td>
                                 <td class="px-4 py-3.5 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('series-documentos.edit', $s) }}"
-                                           class="px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 hover:bg-sky-100 font-semibold transition-colors flex items-center gap-1">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                            Editar
-                                        </a>
+                                        <x-action-button icon="edit" color="amber" label="Editar serie" :href="route('series-documentos.edit', $s)" />
 
                                         @if(!$s->es_predeterminado)
-                                            <form action="{{ route('series-documentos.destroy', $s) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar la serie \'{{ $s->serie }}\'?')">
+                                            <form action="{{ route('series-documentos.destroy', $s) }}" method="POST" onsubmit="confirmFormSubmit(event, '¿Eliminar esta serie?', 'Se eliminará de forma permanente.')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="p-1 text-rose-500 hover:text-rose-700 transition-colors" title="Eliminar Serie">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                </button>
+                                                <x-action-button icon="delete" color="rose" label="Eliminar serie" :submit="true" />
                                             </form>
                                         @endif
                                     </div>

@@ -3,15 +3,12 @@
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <span>Administración</span>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">Auditoría</span>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </span>
                     Auditoría & Trazabilidad de Operaciones
                 </h1>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Bitácora inmutable de eventos, creaciones, modificaciones y eliminaciones en el ERP.</p>
@@ -23,27 +20,27 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tabla</label>
-                    <input type="text" name="tabla" value="{{ request('tabla') }}" placeholder="Nombre de tabla..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
+                    <input type="text" name="tabla" value="{{ request('tabla') }}" placeholder="Nombre de tabla..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Acción</label>
-                    <select name="accion" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
+                    <select name="accion" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
                         <option value="">Todas</option>
-                        <option value="INSERT" {{ request('accion') === 'INSERT' ? 'selected' : '' }}>Crear (INSERT)</option>
-                        <option value="UPDATE" {{ request('accion') === 'UPDATE' ? 'selected' : '' }}>Actualizar (UPDATE)</option>
-                        <option value="DELETE" {{ request('accion') === 'DELETE' ? 'selected' : '' }}>Eliminar (DELETE)</option>
+                        <option value="creacion" {{ request('accion') === 'creacion' ? 'selected' : '' }}>Creación</option>
+                        <option value="edicion" {{ request('accion') === 'edicion' ? 'selected' : '' }}>Edición</option>
+                        <option value="anulacion" {{ request('accion') === 'anulacion' ? 'selected' : '' }}>Anulación</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Usuario</label>
-                    <input type="text" name="usuario" value="{{ request('usuario') }}" placeholder="Nombre de usuario..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
+                    <input type="text" name="usuario" value="{{ request('usuario') }}" placeholder="Nombre de usuario..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Fecha</label>
-                    <input type="date" name="fecha" value="{{ request('fecha') }}" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-primary bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
+                    <input type="date" name="fecha" value="{{ request('fecha') }}" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 bg-white dark:bg-darker-bg text-gray-900 dark:text-gray-100">
                 </div>
                 <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-1">
-                    <button type="submit" class="flex-1 px-4 py-2 bg-purple-primary text-white rounded-lg hover:bg-purple-light transition-colors text-sm font-semibold flex items-center justify-center gap-1">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-cyan-600 dark:bg-cyan-500 text-white rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-600 transition-colors text-sm font-semibold flex items-center justify-center gap-1 shadow-2xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -75,14 +72,14 @@
             @else
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-darker-bg">
+                        <thead class="bg-gray-50/80 dark:bg-darker-bg border-b border-gray-200 dark:border-gray-700/60">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Fecha / Hora</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Tabla / Registro</th>
-                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Acción</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Usuario</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Descripción</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">ID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Fecha / Hora</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Tabla / Registro</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400">Acción</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Usuario</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Descripción</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-card-bg divide-y divide-gray-200 dark:divide-gray-700">
@@ -98,17 +95,17 @@
                                         <div class="text-xs text-gray-500 dark:text-gray-400">ID: #{{ $registro->registro_id }}</div>
                                     </td>
                                     <td class="px-4 py-3 text-center whitespace-nowrap">
-                                        @if($registro->accion === 'INSERT')
+                                        @if($registro->accion === 'creacion')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                                                Crear
+                                                Creación
                                             </span>
-                                        @elseif($registro->accion === 'UPDATE')
+                                        @elseif($registro->accion === 'edicion')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
-                                                Actualizar
+                                                Edición
                                             </span>
-                                        @elseif($registro->accion === 'DELETE')
+                                        @elseif($registro->accion === 'anulacion')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
-                                                Eliminar
+                                                Anulación
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-400">{{ $registro->accion }}</span>
@@ -117,7 +114,7 @@
                                     <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                                         @if($registro->usuario)
                                             <div class="flex items-center gap-2">
-                                                <div class="w-7 h-7 bg-purple-primary rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">
+                                                <div class="w-7 h-7 bg-slate-700 dark:bg-slate-600 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">
                                                     {{ strtoupper(substr($registro->usuario->name, 0, 2)) }}
                                                 </div>
                                                 <div class="truncate max-w-xs">
@@ -129,7 +126,7 @@
                                             <span class="text-gray-500 dark:text-gray-400 text-xs">Sistema</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $registro->descripcion ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $registro->detalle ?? '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
