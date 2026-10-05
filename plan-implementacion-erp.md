@@ -4,18 +4,18 @@
 
 **Instrucción para cualquier agente que trabaje en este documento:** antes de escribir una sola línea de código, lee estos 5 campos para saber exactamente dónde quedó el proyecto — no hace falta revisar el código para ubicarte. Cuando termines tu sesión de trabajo (te quedes sin tokens, termines una fase, o el usuario corte la conversación), **actualiza estos campos como tu último paso antes de responder por última vez**. Así el siguiente agente retoma sin perder contexto.
 
-- **Última actualización:** 26 ago 2026
-- **Fase actual:** Fase 7 — Comprobantes de Venta, Guías de Remisión y Facturación
-- **Último paso completado:** 
-  1) **Dashboard Ejecutivo y Comercial (Business Intelligence):** Rediseño total con KPIs ejecutivos (Ventas Totales, Margen Comercial S/, Margen % / Rentabilidad, Conversión de Cotizaciones), 5 gráficos interactivos Chart.js (Ventas Mensuales, Top Productos por Facturación, Medios/Condiciones de Pago, Tendencia Diaria de Ventas, Líneas de Negocio), Top Clientes, Alertas de Stock Bajo y filtros temporales por Año/Mes.
-  2) **Tasas Impositivas y Comisiones por Documento:** Porcentajes de IGV (%), Retención (%), Comisión Venta (%) y Comisión Ganancia (%) configurables individualmente por cotización (precargadas desde Configuración Global) con guardado en `cotizacion_resumen`.
-  3) **Sistema de Pestañas Estandarizado (`show.blade.php`):** Navegación modular por tabs implementada en Productos, Cotizaciones, Ventas, Órdenes de Compra (Proveedor) y Órdenes de Compra de Clientes, unificada bajo la paleta Deep Slate + Cyan Neón.
-  4) **Diferenciación de Series Comerciales:** Serie `OCC01` configurada para O/C de Clientes vs. `OC01` para Órdenes de Compra a Proveedores, integradas a `series_documentos`.
-  5) **Módulo de Gestión de Series y Correlativos:** CRUD completo, correlativo actual editable, asignación predeterminada y control transaccional de concurrencia (`lockForUpdate`).
-  6) **Generación de PDFs Corporativos Estandarizados:** Visores embebidos y layouts A4 de alta gama para Cotizaciones, Ventas (Serie `V001`) y Órdenes de Compra a Proveedores (Serie `OC01`).
-  7) **Seguridad y Permisos:** Sistema Jerárquico de Roles Dinámicos, Permisos por Módulo y SuperAdmin Padre inmutable con 3 cuentas oficiales configuradas.
-- **Próximo paso concreto:** Emisión de Comprobantes electrónicos (`factura`, `boleta`, `nota_venta`) y Guías de Remisión (`guias_remision`) integradas al módulo transaccional de series y correlativos.
-- **Bloqueos o decisiones pendientes:** Ninguno. Sistema de series dinámicas, cálculo de tasas por documento, control de concurrencia y permisos operativos.
+- **Última actualización:** 3 oct 2026 (remediación de los 16 hallazgos de `AUDITORIA.md`)
+- **Fase actual:** Fase 11 — QA y validación de migraciones MySQL antes del despliegue
+- **Último paso completado:**
+  0) **Remediación de auditoría:** permisos críticos restringidos en servidor; plantilla PDF editable retirada; perfil tributario por cliente heredado en cotización, venta y comprobante con excepción motivada; ventas y recepciones parciales conciliadas bajo bloqueo; stock transaccional en servicio común; correlativos únicos y sin retroceso; auditoría de cambios y permisos ampliada; archivos anteriores conservados hasta confirmar la base. Laravel 13.34.0 y CommonMark 2.10.3 sin avisos en `composer audit --locked`. Suite: 55 pruebas y 281 aserciones en verde; vistas Blade compiladas, Pint y `git diff --check` correctos.
+  1) **Fase 7a — Comprobantes de Venta:** `ComprobanteVentaController` (factura `F001` / boleta `B001` / nota de venta `NV01`) con emisión desde venta (hereda subtotal+IGV, 1 comprobante vigente por venta), vistas `comprobantes/index-create-show-pdf` bajo estándar corporativo, visor embebido, acción Anular y rutas bajo `modulo:comprobantes` + enlace en sidebar y botones en `ventas/show`.
+  2) **Fase 7b — Guías de Remisión:** `GuiaRemisionController` (serie `T001`, precarga de ítems desde venta, traslado sin venta permitido, no mueve stock), vistas `guias-remision/index-create-show-pdf` bajo estándar corporativo, acción Anular y rutas bajo `modulo:comprobantes` + enlace en sidebar.
+  3) **Fase 8 — Compras/Recepción:** `CompraController` (precarga desde O/C aprobada o compra directa, movimientos `entrada` en kardex, O/C pasa a `recibida`), vistas `compras/index-create-show`, rutas bajo `modulo:compras`, enlace en sidebar y botón "Recepcionar compra" en `ordenes-compra/show`.
+  4) **Fase 9 — Auditoría:** `AuditoriaObserver` genérico registrado en `AppServiceProvider` para `Cotizacion, Venta, Compra, ComprobanteVenta, GuiaRemision, OrdenCompra, User` (creacion/edicion/anulacion, nunca rompe la operación); `AuditoriaController` + vista alineados al esquema real (`creacion/edicion/anulacion`, campo `detalle`, filtro por fecha); migración `auditoria.usuario_id` nullable con `nullOnDelete` para no bloquear eliminación de usuarios.
+  5) **Fase 11 — QA:** `FlujosComercialCompraTest` (flujo Venta→Comprobante→Guía con PDFs y anulaciones; flujo O/C→aprobación→recepción con kardex; seguridad 403 para rol ventas en comprobantes/compras/guías) + `SystemSmokeTest` ampliado a las nuevas rutas. Suite completa: 46 tests pasando. Correcciones multi-driver: accesor `total` en `ComprobanteVenta` (columna generada solo existe en MySQL) y fallback `OCC01` en `SerieDocumento::siguienteCodigo()`.
+- **Próximo paso concreto:** En un entorno MySQL de prueba, respaldar datos, revisar duplicados de serie/correlativo, aplicar las migraciones `2026_10_03_000001` a `000004` y probar concurrencia de facturas, stock y recepciones. El despliegue en cPanel sigue diferido por petición del usuario.
+- **Bloqueos o decisiones pendientes:** MySQL local no disponible (`Connection refused` en `gestion_cotizaciones`); las pruebas automáticas se ejecutaron con SQLite en memoria. No se aplicaron migraciones a la base real ni se desplegó. La migración de unicidad detendrá la ejecución con un mensaje si encuentra correlativos históricos duplicados.
+- **Corrección crítica 20 sep 2026 (UrlGenerationException en proveedores):** el singularizador inglés generaba `{proveedore}` y `{ordenes_compra_cliente}`, rompiendo el implicit binding (el controlador recibía un modelo vacío y la vista fallaba al generar la URL). Solución: `->parameters()` explícitos en `proveedores` y `ordenes-compra-cliente`; además se restringieron con `->only()` los resources con métodos inexistentes (`ventas`, `ordenes-compra`, `users`, `roles`, `series-documentos`) para que respondan 404/405 en vez de 500. Regresión cubierta por `RouteBindingRegressionTest`.
 - **Notas para el siguiente agente:** Cuentas activas en el sistema: 1) SuperAdmin: `admin@jhardsystex.com` / `admin@jhardsystex` (Nombre: Administrador General), 2) `ventas@jhardsystex.com` / `ventas@jhardsystex` (Nombre: Ejecutivo de Ventas), 3) `soporte@jhardsystex.com` / `soporte@jhardsystex` (Nombre: Soporte / Logística). Password para todos: `password`.
 
 
@@ -88,8 +88,7 @@ Convierte cada tabla de `sistema_erp.sql` en su migración Laravel equivalente y
 - [x] Columna generada `ganancia_linea` en `venta_detalle`
 - [x] Columna generada `subtotal` en `orden_compra_detalle`
 - [x] Columna generada `total` en `comprobantes_venta`
-- [x] Trigger `trg_movimiento_stock` (actualiza `stock_actual` en `productos`)
-- [x] Trigger `trg_movimiento_valida` (valida stock suficiente y referencia válida)
+- [x] Los triggers históricos `trg_movimiento_stock` y `trg_movimiento_valida` se sustituyeron por `InventarioService` transaccional en la migración `2026_10_03_000002` (la lógica se prueba también en SQLite)
 - [x] Trigger `trg_resumen_valida_subtotal`
 - [x] Trigger `trg_venta_detalle_valida_producto`
 - [x] Trigger `trg_compra_detalle_valida_producto`
@@ -120,7 +119,7 @@ Convierte cada tabla de `sistema_erp.sql` en su migración Laravel equivalente y
 - [x] `ProductoController` resource + validación (`puede_venderse`/`puede_comprarse`)
 - [x] `productos/index.blade.php` y `productos/show.blade.php` con pestañas (`DETALLES`, `INVENTARIO`, `OPCIONES`, `PROVEEDORES`, `PRESENTACIONES`) en paleta unificada Slate/Cyan
 - [x] `MovimientoInventarioController`: kardex por producto y ajustes manuales de inventario
-- [x] Captura de errores de stock del trigger en excepciones amigables
+- [x] Validación de stock y kardex en servicio transaccional con errores de validación amigables
 
 ---
 
@@ -167,11 +166,11 @@ Convierte cada tabla de `sistema_erp.sql` en su migración Laravel equivalente y
 - [x] `SerieDocumentoController`: administración completa de series y correlativo actual por tipo de documento (`series-documentos/index.blade.php`, `create.blade.php`, `edit.blade.php`)
 - [x] Soporte para todos los tipos de documentos: `cotizacion` (`C001`), `venta` (`V001`), `orden_compra` (`OC01`), `orden_compra_cliente` (`OCC01`), `factura` (`F001`), `boleta` (`B001`), `nota_venta` (`NV01`), `guia_remision` (`T001`)
 - [x] Control transaccional de concurrencia mediante `lockForUpdate()` en `SerieDocumento::siguienteCodigo()` para evitar correlativos duplicados
-- [ ] `ComprobanteVentaController`: emisión de Facturas, Boletas y Notas de Venta
-- [ ] `comprobantes/create.blade.php`, `comprobantes/pdf.blade.php`
-- [ ] `GuiaRemisionController`: formulario con datos de traslado (punto de partida/llegada, transportista, placa) y detalle
-- [ ] `guias-remision/create.blade.php`, `guias-remision/pdf.blade.php`
-- [ ] Acción "Anular" en comprobantes y guías
+- [x] `ComprobanteVentaController`: emisión de Facturas, Boletas y Notas de Venta
+- [x] `comprobantes/index-create-show-pdf.blade.php` (estándar corporativo + visor embebido)
+- [x] `GuiaRemisionController`: formulario con datos de traslado (punto de partida/llegada, transportista, placa) y detalle
+- [x] `guias-remision/index-create-show-pdf.blade.php` (estándar corporativo + visor embebido)
+- [x] Acción "Anular" en comprobantes y guías
 
 ---
 
@@ -181,16 +180,16 @@ Convierte cada tabla de `sistema_erp.sql` en su migración Laravel equivalente y
 - [x] `ordenes-compra/create.blade.php`: proveedor + líneas dinámicas (producto, cantidad, precio de compra, cálculo automático de subtotal e IGV)
 - [x] `ordenes-compra/show.blade.php`: interfaz organizada en pestañas (`DATOS DE LA O/C`, `BIENES`, `VISOR PDF`) con visor interactivo de PDF embebido y acciones de aprobación/anulación
 - [x] Generación de PDF corporativo de Orden de Compra a Proveedor (`ordenes-compra/pdf.blade.php`)
-- [ ] `CompraController`: recepción de mercadería precargada desde O/C aprobada o compra directa
-- [ ] Al confirmar la compra, generar automáticamente los `movimientos_inventario` de tipo `entrada`
-- [ ] Actualizar `ordenes_compra.estado = 'recibida'`
+- [x] `CompraController`: recepción de mercadería precargada desde O/C aprobada o compra directa
+- [x] Al confirmar la compra, generar automáticamente los `movimientos_inventario` de tipo `entrada`
+- [x] Actualizar `ordenes_compra.estado = 'recibida'`
 
 ---
 
 ## Fase 9 — Auditoría
 
-- [ ] `AuditoriaObserver` sobre los modelos clave (`Cotizacion`, `Venta`, `Compra`, `ComprobanteVenta`, `OrdenCompra`, `User`)
-- [ ] `auditoria/index.blade.php`: listado filtrable por tabla, usuario y acción
+- [x] `AuditoriaObserver` sobre los modelos clave (`Cotizacion`, `Venta`, `Compra`, `ComprobanteVenta`, `GuiaRemision`, `OrdenCompra`, `User`)
+- [x] `auditoria/index.blade.php`: listado filtrable por tabla, usuario, acción y fecha (alineado al esquema real)
 
 ---
 
@@ -209,9 +208,9 @@ Convierte cada tabla de `sistema_erp.sql` en su migración Laravel equivalente y
 - [x] Sistema de navegación por pestañas (`show.blade.php`) estandarizado en Productos, Cotizaciones, Ventas, Órdenes de Compra a Proveedores y O/C de Clientes
 - [x] Estandarización de PDFs corporativos (Cotizaciones, Notas de Venta, Órdenes de Compra)
 - [x] Cobertura de pruebas automatizadas completa con 40 tests unitarios y de integración pasando al 100%
-- [ ] Pruebas end-to-end de flujo comercial completo (OC Cliente → Cotización → Venta → Comprobante → Guía)
-- [ ] Pruebas de flujo de compra (Orden de Compra → Recepción de Compra → Aumento de Stock)
-- [ ] Verificación de seguridad de rutas y permisos
+- [x] Pruebas end-to-end de flujo comercial completo (Venta → Comprobante → Guía, con PDFs y anulaciones)
+- [x] Pruebas de flujo de compra (Orden de Compra → Recepción de Compra → kardex de entrada)
+- [x] Verificación de seguridad de rutas y permisos (403 para rol ventas en comprobantes/compras/guías; smoke test ampliado)
 
 ---
 
@@ -253,5 +252,5 @@ Todos los documentos generados e impresos en PDF (Cotizaciones, Órdenes de Comp
 - [x] **Cotizaciones:** `resources/views/cotizaciones/pdf.blade.php`
 - [x] **Ventas / Notas de Venta:** `resources/views/ventas/pdf.blade.php`
 - [x] **Órdenes de Compra a Proveedor:** `resources/views/ordenes-compra/pdf.blade.php`
-- [ ] **Comprobantes de Venta (Facturas / Boletas):** `resources/views/comprobantes/pdf.blade.php`
-- [ ] **Guías de Remisión:** `resources/views/guias-remision/pdf.blade.php`
+- [x] **Comprobantes de Venta (Facturas / Boletas):** `resources/views/comprobantes/pdf.blade.php`
+- [x] **Guías de Remisión:** `resources/views/guias-remision/pdf.blade.php`
