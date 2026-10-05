@@ -6,15 +6,15 @@ class NumeroALetras
 {
     private static array $unidades = [
         '', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE',
-        'DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISEIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE', 'VEINTE'
+        'DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISEIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE', 'VEINTE',
     ];
 
     private static array $decenas = [
-        '', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'
+        '', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA',
     ];
 
     private static array $centenas = [
-        '', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'
+        '', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS',
     ];
 
     public static function convertir(float $monto, string $moneda = 'Soles'): string
@@ -36,8 +36,12 @@ class NumeroALetras
 
     private static function seccion(int $numero): string
     {
-        if ($numero === 0) return '';
-        if ($numero === 100) return 'CIEN';
+        if ($numero === 0) {
+            return '';
+        }
+        if ($numero === 100) {
+            return 'CIEN';
+        }
 
         if ($numero < 1000) {
             return self::centenas($numero);
@@ -46,15 +50,17 @@ class NumeroALetras
         if ($numero < 1000000) {
             $miles = (int) ($numero / 1000);
             $resto = $numero % 1000;
-            $txtMiles = ($miles === 1) ? 'MIL' : self::seccion($miles) . ' MIL';
-            return trim($txtMiles . ' ' . self::seccion($resto));
+            $txtMiles = ($miles === 1) ? 'MIL' : self::seccion($miles).' MIL';
+
+            return trim($txtMiles.' '.self::seccion($resto));
         }
 
         if ($numero < 1000000000) {
             $millones = (int) ($numero / 1000000);
             $resto = $numero % 1000000;
-            $txtMillones = ($millones === 1) ? 'UN MILLÓN' : self::seccion($millones) . ' MILLONES';
-            return trim($txtMillones . ' ' . self::seccion($resto));
+            $txtMillones = ($millones === 1) ? 'UN MILLÓN' : self::seccion($millones).' MILLONES';
+
+            return trim($txtMillones.' '.self::seccion($resto));
         }
 
         return (string) $numero;
@@ -68,7 +74,7 @@ class NumeroALetras
         $str = self::$centenas[$c] ?? '';
 
         if ($resto > 0) {
-            $str .= ' ' . self::decenas($resto);
+            $str .= ' '.self::decenas($resto);
         }
 
         return trim($str);
@@ -81,7 +87,7 @@ class NumeroALetras
         }
 
         if ($numero < 30) {
-            return 'VEINTI' . self::$unidades[$numero - 20];
+            return 'VEINTI'.self::$unidades[$numero - 20];
         }
 
         $d = (int) ($numero / 10);
@@ -89,7 +95,7 @@ class NumeroALetras
 
         $str = self::$decenas[$d] ?? '';
         if ($u > 0) {
-            $str .= ' Y ' . self::$unidades[$u];
+            $str .= ' Y '.self::$unidades[$u];
         }
 
         return trim($str);

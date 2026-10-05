@@ -17,12 +17,16 @@ class Auditoria extends Model
         'usuario_id',
         'accion',
         'detalle',
+        'datos_anteriores',
+        'datos_nuevos',
     ];
 
     protected function casts(): array
     {
         return [
             'created_at' => 'datetime',
+            'datos_anteriores' => 'array',
+            'datos_nuevos' => 'array',
         ];
     }
 

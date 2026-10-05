@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MovimientoInventario extends Model
 {
+    use PersistsAuditably;
+
     public $timestamps = false;
 
     protected $table = 'movimientos_inventario';

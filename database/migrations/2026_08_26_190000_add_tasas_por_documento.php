@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\Database\MySqlSchema;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ return new class extends Migration
         });
 
         // Backfill existing rows with their config values
-        if (\App\Support\Database\MySqlSchema::isMySql()) {
+        if (MySqlSchema::isMySql()) {
             DB::statement('
                 UPDATE cotizacion_resumen cr
                 JOIN configuracion c ON cr.configuracion_id = c.id

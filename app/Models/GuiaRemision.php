@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GuiaRemision extends Model
 {
+    use PersistsAuditably;
+
     public $timestamps = false;
 
     protected $table = 'guias_remision';
@@ -33,6 +36,13 @@ class GuiaRemision extends Model
             'fecha_traslado' => 'date',
             'created_at' => 'datetime',
         ];
+    }
+
+    public function getCodigoFormateadoAttribute(): string
+    {
+        $serie = $this->serie ?: 'T001';
+
+        return $serie.'-'.str_pad((int) $this->numero, 6, '0', STR_PAD_LEFT);
     }
 
     public function venta(): BelongsTo

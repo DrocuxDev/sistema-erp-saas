@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Venta extends Model
 {
+    use PersistsAuditably;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -22,6 +25,11 @@ class Venta extends Model
         'subtotal',
         'igv',
         'total',
+        'precio_incluye_igv',
+        'pct_igv',
+        'pct_retencion',
+        'retencion',
+        'motivo_excepcion_tributaria',
     ];
 
     protected function casts(): array
@@ -32,17 +40,22 @@ class Venta extends Model
             'subtotal' => 'decimal:2',
             'igv' => 'decimal:2',
             'total' => 'decimal:2',
+            'precio_incluye_igv' => 'boolean',
+            'pct_igv' => 'decimal:2',
+            'pct_retencion' => 'decimal:2',
+            'retencion' => 'decimal:2',
             'created_at' => 'datetime',
         ];
     }
 
     public function getCodigoFormateadoAttribute(): string
     {
-        if (!empty($this->codigo)) {
+        if (! empty($this->codigo)) {
             return $this->codigo;
         }
         $serie = $this->serie ?: 'V001';
-        return $serie . '-' . str_pad($this->correlativo ?: 1, 6, '0', STR_PAD_LEFT);
+
+        return $serie.'-'.str_pad($this->correlativo ?: 1, 6, '0', STR_PAD_LEFT);
     }
 
     public function cotizacion(): BelongsTo
@@ -78,5 +91,15 @@ class Venta extends Model
     public function guiasRemision(): HasMany
     {
         return $this->hasMany(GuiaRemision::class, 'venta_id');
+    }
+
+    public function devoluciones(): HasMany
+    {
+        return $this->hasMany(DevolucionVenta::class, 'venta_id');
+    }
+
+    public function cobros(): HasMany
+    {
+        return $this->hasMany(CobroVenta::class, 'venta_id');
     }
 }

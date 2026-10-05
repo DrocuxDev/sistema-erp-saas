@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrdenCompra extends Model
 {
+    use PersistsAuditably;
+
     public $timestamps = false;
 
     protected $table = 'ordenes_compra';
@@ -43,11 +46,12 @@ class OrdenCompra extends Model
 
     public function getCodigoFormateadoAttribute(): string
     {
-        if (!empty($this->codigo)) {
+        if (! empty($this->codigo)) {
             return $this->codigo;
         }
         $serie = $this->serie ?: 'OC01';
-        return $serie . '-' . str_pad($this->correlativo ?: 1, 6, '0', STR_PAD_LEFT);
+
+        return $serie.'-'.str_pad($this->correlativo ?: 1, 6, '0', STR_PAD_LEFT);
     }
 
     public function proveedor(): BelongsTo

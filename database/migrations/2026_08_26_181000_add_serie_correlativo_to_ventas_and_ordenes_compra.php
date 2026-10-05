@@ -39,7 +39,7 @@ return new class extends Migration
         foreach ($ventas as $v) {
             $subtotal = round($v->total / 1.18, 2);
             $igv = round($v->total - $subtotal, 2);
-            $codigo = 'V001-' . str_pad($corrVenta, 6, '0', STR_PAD_LEFT);
+            $codigo = 'V001-'.str_pad($corrVenta, 6, '0', STR_PAD_LEFT);
             DB::table('ventas')->where('id', $v->id)->update([
                 'serie' => 'V001',
                 'correlativo' => $corrVenta,
@@ -60,7 +60,7 @@ return new class extends Migration
         $ordenesCompra = DB::table('ordenes_compra')->orderBy('id')->get();
         $corrOC = 1;
         foreach ($ordenesCompra as $oc) {
-            $codigo = 'OC01-' . str_pad($corrOC, 6, '0', STR_PAD_LEFT);
+            $codigo = 'OC01-'.str_pad($corrOC, 6, '0', STR_PAD_LEFT);
             DB::table('ordenes_compra')->where('id', $oc->id)->update([
                 'serie' => 'OC01',
                 'correlativo' => $corrOC,

@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class OrdenCompraCliente extends Model
 {
+    use PersistsAuditably;
+
     public $timestamps = false;
 
     protected $table = 'ordenes_compra_cliente';
@@ -60,5 +64,10 @@ class OrdenCompraCliente extends Model
     public function ventaGenerada(): HasOne
     {
         return $this->hasOne(Venta::class, 'orden_compra_cliente_id');
+    }
+
+    public function ventas(): HasMany
+    {
+        return $this->hasMany(Venta::class, 'orden_compra_cliente_id');
     }
 }

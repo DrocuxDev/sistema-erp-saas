@@ -32,7 +32,7 @@ return new class extends Migration
             DB::table('cotizaciones')->where('id', $cot->id)->update([
                 'serie' => 'C001',
                 'correlativo' => $correlativo,
-                'codigo' => 'C001-' . $correlativo,
+                'codigo' => 'C001-'.$correlativo,
                 'version' => $cot->version ?? 1,
                 'tipo_cotizacion' => 'producto',
                 'asunto' => 'COTIZACIÓN DE EQUIPOS Y SERVICIOS TI',

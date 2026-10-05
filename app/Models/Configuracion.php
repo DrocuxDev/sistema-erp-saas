@@ -24,6 +24,15 @@ class Configuracion extends Model
         'forma_pago_default',
         'validez_oferta_default',
         'logistica_default',
+        'portada_imagen_path',
+        'incluir_portada',
+        'logo_path',
+        'color_principal',
+        'color_tabla_encabezado',
+        'texto_saludo',
+        'condiciones_adicionales_default',
+        'texto_firma',
+        'titular_cuenta',
         'pdf_template_cotizacion',
         'pct_igv',
         'pct_retencion',
@@ -40,6 +49,7 @@ class Configuracion extends Model
             'pct_comision_venta' => 'decimal:2',
             'pct_comision_ganancia' => 'decimal:2',
             'activo' => 'boolean',
+            'incluir_portada' => 'boolean',
             'created_at' => 'datetime',
         ];
     }

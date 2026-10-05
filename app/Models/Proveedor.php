@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Proveedor extends Model
 {
+    use PersistsAuditably;
+
     protected $table = 'proveedores';
+
     public $timestamps = false;
 
     protected $fillable = [
         'nombre',
+        'imagen',
         'razon_social',
         'ruc',
         'direccion',

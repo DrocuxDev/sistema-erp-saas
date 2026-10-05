@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Compra extends Model
 {
+    use PersistsAuditably;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -45,5 +48,15 @@ class Compra extends Model
     public function detalles(): HasMany
     {
         return $this->hasMany(CompraDetalle::class, 'compra_id');
+    }
+
+    public function devoluciones(): HasMany
+    {
+        return $this->hasMany(DevolucionCompra::class, 'compra_id');
+    }
+
+    public function pagos(): HasMany
+    {
+        return $this->hasMany(PagoCompra::class, 'compra_id');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Cotizacion extends Model
 {
+    use PersistsAuditably;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -29,6 +32,10 @@ class Cotizacion extends Model
         'forma_pago',
         'logistica',
         'validez_oferta',
+        'precio_incluye_igv',
+        'motivo_excepcion_tributaria',
+        'documento_snapshot',
+        'condiciones_adicionales',
     ];
 
     protected $table = 'cotizaciones';
@@ -40,6 +47,8 @@ class Cotizacion extends Model
             'created_at' => 'datetime',
             'correlativo' => 'integer',
             'version' => 'integer',
+            'precio_incluye_igv' => 'boolean',
+            'documento_snapshot' => 'array',
         ];
     }
 
@@ -67,7 +76,7 @@ class Cotizacion extends Model
             default => 'Producto / Equipamiento',
         };
     }
-    
+
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
@@ -93,9 +102,8 @@ class Cotizacion extends Model
         return $this->hasOne(CotizacionResumen::class, 'cotizacion_id');
     }
 
-    public function venta(): HasOne
+    public function ventas(): HasMany
     {
-        return $this->hasOne(Venta::class, 'cotizacion_id');
+        return $this->hasMany(Venta::class, 'cotizacion_id');
     }
 }
-

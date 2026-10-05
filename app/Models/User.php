@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PersistsAuditably;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,8 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    use PersistsAuditably;
 
     protected $fillable = [
         'name',
@@ -72,6 +75,20 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return (bool) $this->is_superadmin;
+    }
+
+    public function puedeAccion(string $accion): bool
+    {
+        $roles = [
+            'aprobar' => ['gerencia', 'administracion'],
+            'anular' => ['gerencia', 'administracion'],
+            'ajustar_inventario' => ['gerencia', 'administracion'],
+            'finanzas' => ['gerencia', 'administracion'],
+        ];
+
+        return $this->isSuperAdmin()
+            || in_array($this->rolPersonalizado?->slug, $roles[$accion] ?? [], true)
+            || ($this->rol_id === null && $this->isAdministrador());
     }
 
     /**
