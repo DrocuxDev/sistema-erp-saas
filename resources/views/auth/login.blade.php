@@ -1,16 +1,18 @@
 <x-auth-split-layout>
-    <div class="mb-10">
-        <h2 class="text-4xl font-bold text-gray-900 leading-tight">Iniciar sesión</h2>
-        <p class="mt-3 text-sm text-gray-500 font-normal">
+    <div class="mb-7">
+        <h2 class="text-2xl font-bold text-white tracking-tight">Iniciar sesión</h2>
+        <p class="mt-3 text-sm leading-relaxed text-slate-400">
             Accede a tu cuenta para usar el sistema ERP
         </p>
     </div>
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-6">
+    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+    <form method="POST" action="{{ route('login') }}" class="space-y-5">
         @csrf
 
         <div>
-            <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">
+            <label for="email" class="ui-label mb-2">
                 Correo electrónico
             </label>
             <input
@@ -22,18 +24,18 @@
                 autofocus
                 autocomplete="username"
                 placeholder="nombre@jhardsystex.com"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/20 transition-all bg-white"
+                class="ui-input"
             />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <div>
-            <div class="flex items-center justify-between mb-2">
-                <label for="password" class="block text-sm font-semibold text-gray-900">
+            <div class="flex items-center justify-between mb-2 gap-3">
+                <label for="password" class="ui-label mb-0">
                     Contraseña
                 </label>
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="text-xs font-medium text-brand-teal hover:text-brand-teal/80 transition-colors">
+                    <a href="{{ route('password.request') }}" class="text-xs font-medium text-cyan-accent hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-accent">
                         ¿Olvidaste tu contraseña?
                     </a>
                 @endif
@@ -46,13 +48,15 @@
                     required
                     autocomplete="current-password"
                     placeholder="••••••••"
-                    class="block w-full rounded-lg border border-gray-300 px-4 py-3 pr-11 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/20 transition-all bg-white"
+                    class="ui-input pr-11"
                 />
                 <button
                     type="button"
                     id="toggle-password"
-                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-accent rounded-md"
                     aria-label="Mostrar contraseña"
+                    aria-pressed="false"
+                    aria-controls="password"
                 >
                     <svg id="eye-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
@@ -71,16 +75,16 @@
                 id="remember_me"
                 type="checkbox"
                 name="remember"
-                class="w-4 h-4 rounded border-gray-300 text-gray-600 focus:ring-2 focus:ring-brand-teal/20 cursor-pointer"
+                class="ui-check bg-darker-bg text-cyan-primary cursor-pointer"
             />
-            <label for="remember_me" class="ms-3 text-sm font-medium text-gray-900 cursor-pointer">
+            <label for="remember_me" class="ms-3 text-sm text-slate-300 cursor-pointer">
                 Mantener sesión iniciada
             </label>
         </div>
 
         <button
             type="submit"
-            class="w-full rounded-lg bg-brand-dark px-4 py-3 text-base font-semibold text-white hover:bg-brand-dark/90 focus:outline-none focus:ring-2 focus:ring-brand-teal focus:ring-offset-2 transition-all duration-200"
+            class="btn-primary w-full py-3 focus-visible:ring-offset-darker-bg"
         >
             Iniciar sesión
         </button>
@@ -94,6 +98,7 @@
             const isHidden = input.type === 'password';
 
             input.type = isHidden ? 'text' : 'password';
+            this.setAttribute('aria-pressed', String(isHidden));
             eyeOpen.classList.toggle('hidden', isHidden);
             eyeClosed.classList.toggle('hidden', !isHidden);
             this.setAttribute('aria-label', isHidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
