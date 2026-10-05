@@ -28,16 +28,16 @@ class DashboardMetricsTest extends TestCase
     public function test_usuario_con_permiso_puede_acceder_al_dashboard(): void
     {
         $admin = User::where('email', 'admin@jhardsystex.com')->first();
-        if (!$admin) {
+        if (! $admin) {
             $admin = User::factory()->create(['rol' => 'administrador', 'is_superadmin' => true]);
         }
 
         $response = $this->actingAs($admin)->get(route('dashboard'));
         $response->assertOk();
-        $response->assertSee('Dashboard de Ventas y Operaciones');
+        $response->assertSee('Panel comercial');
         $response->assertSee('Ventas Totales');
-        $response->assertSee('Margen S/');
-        $response->assertSee('Margen Promedio %');
+        $response->assertSee('Margen Bruto (Ganancia)');
+        $response->assertSee('Margen promedio ponderado');
         $response->assertSee('Facturación Mensual');
         $response->assertSee('Top Productos por Facturación');
     }
@@ -45,7 +45,7 @@ class DashboardMetricsTest extends TestCase
     public function test_dashboard_calcula_metricas_correctamente(): void
     {
         $admin = User::where('email', 'admin@jhardsystex.com')->first();
-        if (!$admin) {
+        if (! $admin) {
             $admin = User::factory()->create(['rol' => 'administrador', 'is_superadmin' => true]);
         }
 
@@ -111,7 +111,7 @@ class DashboardMetricsTest extends TestCase
     public function test_dashboard_filtros_por_anio_y_mes(): void
     {
         $admin = User::where('email', 'admin@jhardsystex.com')->first();
-        if (!$admin) {
+        if (! $admin) {
             $admin = User::factory()->create(['rol' => 'administrador', 'is_superadmin' => true]);
         }
 

@@ -32,10 +32,10 @@ class UserRolePermissionTest extends TestCase
 
         // Intentar eliminar al SuperAdmin desde la sesión de otro Admin
         $response = $this->actingAs($otroAdmin)->delete(route('users.destroy', $superAdmin));
-        
+
         $response->assertRedirect(route('users.index'));
         $response->assertSessionHas('error', 'Acceso denegado: El Administrador Principal (SuperAdmin) no puede ser eliminado.');
-        
+
         // El SuperAdmin sigue existiendo
         $this->assertDatabaseHas('users', ['id' => $superAdmin->id]);
     }
@@ -99,5 +99,28 @@ class UserRolePermissionTest extends TestCase
 
         $response = $this->actingAs($usuarioInactivo)->get(route('cotizaciones.index'));
         $response->assertRedirect(route('login'));
+    }
+
+    public function test_administrador_no_puede_autoasignarse_privilegios_ni_crear_superadmin(): void
+    {
+        $rolAdministracion = Rol::where('slug', 'administracion')->firstOrFail();
+        $rolSuperadmin = Rol::where('slug', 'superadmin')->firstOrFail();
+        $administrador = User::factory()->create([
+            'rol' => 'administrador', 'rol_id' => $rolAdministracion->id,
+            'is_superadmin' => false, 'activo' => true,
+        ]);
+        $datos = [
+            'name' => 'Administración', 'email' => $administrador->email,
+            'username' => $administrador->username, 'rol_id' => $rolSuperadmin->id,
+            'punto_emision' => 'OFICINA', 'activo' => 1,
+        ];
+        $this->actingAs($administrador)->put(route('users.update', $administrador), $datos)->assertForbidden();
+        $this->assertFalse($administrador->fresh()->isSuperAdmin());
+
+        $this->actingAs($administrador)->post(route('users.store'), [
+            ...$datos, 'email' => 'nuevo@ejemplo.test', 'username' => 'nuevo',
+            'password' => 'secreto123', 'password_confirmation' => 'secreto123',
+        ])->assertForbidden();
+        $this->assertDatabaseMissing('users', ['email' => 'nuevo@ejemplo.test']);
     }
 }

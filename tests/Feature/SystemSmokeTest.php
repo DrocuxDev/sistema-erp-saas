@@ -16,10 +16,15 @@ class SystemSmokeTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $trabajador;
+
     protected Cliente $cliente;
+
     protected Proveedor $proveedor;
+
     protected Producto $producto;
+
     protected Cotizacion $cotizacion;
 
     protected function setUp(): void
@@ -106,11 +111,18 @@ class SystemSmokeTest extends TestCase
             '/ordenes-compra-cliente/create',
             '/cotizaciones',
             '/cotizaciones/create',
-            '/cotizaciones/' . $this->cotizacion->id,
-            '/cotizaciones/' . $this->cotizacion->id . '/edit',
-            '/cotizaciones/' . $this->cotizacion->id . '/pdf',
+            '/cotizaciones/'.$this->cotizacion->id,
+            '/cotizaciones/'.$this->cotizacion->id.'/edit',
+            '/cotizaciones/'.$this->cotizacion->id.'/pdf',
             '/ventas',
             '/ventas/create',
+            '/comprobantes',
+            '/comprobantes/create',
+            '/guias-remision',
+            '/guias-remision/create',
+            '/ordenes-compra',
+            '/compras',
+            '/compras/create',
             '/configuracion',
             '/auditoria',
         ];

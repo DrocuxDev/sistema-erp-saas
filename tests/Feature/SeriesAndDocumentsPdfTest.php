@@ -3,13 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Cliente;
-use App\Models\Configuracion;
-use App\Models\Cotizacion;
 use App\Models\OrdenCompra;
 use App\Models\Producto;
 use App\Models\Proveedor;
-use App\Models\Rol;
-use App\Models\SerieDocumento;
 use App\Models\User;
 use App\Models\Venta;
 use Database\Seeders\ConfiguracionSeeder;
@@ -22,9 +18,13 @@ class SeriesAndDocumentsPdfTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $vendedor;
+
     protected Cliente $cliente;
+
     protected Proveedor $proveedor;
+
     protected Producto $producto;
 
     protected function setUp(): void
@@ -98,15 +98,15 @@ class SeriesAndDocumentsPdfTest extends TestCase
                     'cantidad' => 2,
                     'precio_venta_unit' => 1800,
                     'precio_compra_unit' => 1200,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $venta = Venta::latest('id')->first();
         $this->assertNotNull($venta);
         $this->assertEquals('V001', $venta->serie);
         $this->assertStringStartsWith('V001-', $venta->codigo_formateado);
-        $this->assertEquals(3600.00, (float) $venta->total);
+        $this->assertEquals(4248.00, (float) $venta->total);
 
         // Probar visualización de detalle y PDF
         $responseShow = $this->actingAs($this->admin)->get(route('ventas.show', $venta));
@@ -131,8 +131,8 @@ class SeriesAndDocumentsPdfTest extends TestCase
                     'producto_id' => $this->producto->id,
                     'cantidad' => 5,
                     'precio_compra' => 1200,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $ordenCompra = OrdenCompra::latest('id')->first();

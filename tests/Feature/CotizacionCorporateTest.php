@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Cliente;
+use App\Models\Configuracion;
 use App\Models\Cotizacion;
 use App\Models\Producto;
 use App\Models\Proveedor;
@@ -71,8 +72,8 @@ class CotizacionCorporateTest extends TestCase
         $cotizacion = Cotizacion::first();
         $this->assertNotNull($cotizacion);
         $this->assertEquals('C001', $cotizacion->serie);
-        $this->assertEquals(0, $cotizacion->correlativo);
-        $this->assertEquals('C001-0', $cotizacion->codigo_formateado);
+        $this->assertEquals(1, $cotizacion->correlativo);
+        $this->assertEquals('C001-00000001', $cotizacion->codigo_formateado);
         $this->assertEquals('001', $cotizacion->version_formateada);
         $this->assertEquals('producto', $cotizacion->tipo_cotizacion);
         $this->assertEquals('COTIZACION PROYECTO O_US', $cotizacion->asunto);
@@ -160,11 +161,13 @@ class CotizacionCorporateTest extends TestCase
             'estado' => 'pendiente',
         ]);
 
+        Configuracion::where('activo', true)->update(['pdf_template_cotizacion' => '@php echo "PLANTILLA_NO_EJECUTADA"; @endphp']);
         $responseHtml = $this->actingAs($user)->get(route('cotizaciones.pdf', ['cotizacion' => $cotizacion, 'html' => 1]));
         $responseHtml->assertOk();
-        $responseHtml->assertSee('C001-0');
+        $responseHtml->assertSee('C001-00000000');
         $responseHtml->assertSee('COTIZACIÓN');
         $responseHtml->assertSee('SURPERU');
+        $responseHtml->assertDontSee('PLANTILLA_NO_EJECUTADA');
 
         $responsePdf = $this->actingAs($user)->get(route('cotizaciones.pdf', $cotizacion));
         $responsePdf->assertOk();
@@ -189,6 +192,7 @@ class CotizacionCorporateTest extends TestCase
             'asunto' => 'COTIZACION CON TASAS PERSONALIZADAS',
             'fecha' => '2026-08-26',
             'pct_igv' => 10.00,
+            'motivo_excepcion_tributaria' => 'Condición tributaria pactada con el cliente',
             'pct_retencion' => 0.00,
             'pct_comision_venta' => 8.00,
             'pct_comision_ganancia' => 15.00,
