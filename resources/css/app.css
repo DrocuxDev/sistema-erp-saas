@@ -2,6 +2,182 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+    html {
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+    table, .tabular-nums, .font-mono {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+@layer components {
+    /* ===== ERP layout: contenedor fluido (1280–1440px) ===== */
+    .page-container {
+        @apply w-full mx-auto;
+        max-width: 1400px;
+        padding-inline: clamp(1rem, 1rem + 2vw, 2rem);
+    }
+
+    /* ===== Tipografía: jerarquía página ===== */
+    .page-title {
+        @apply text-2xl font-bold tracking-tight text-gray-900 dark:text-white;
+    }
+    .page-subtitle {
+        @apply text-sm text-gray-600 dark:text-gray-400 mt-1;
+    }
+    .page-eyebrow {
+        @apply flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1;
+    }
+
+    /* ===== Formularios: label + controles (base 8px, target ≥40px) ===== */
+    .form-label {
+        @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
+    }
+    .form-label-xs {
+        @apply block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5;
+    }
+    .form-input, .form-select, .form-textarea {
+        @apply w-full min-h-[40px] rounded-xl border border-gray-300 dark:border-gray-600
+            bg-white dark:bg-darker-bg px-3.5 text-sm
+            text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
+            transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500;
+    }
+    .form-input, .form-select {
+        @apply py-2;
+    }
+    .form-hint {
+        @apply text-xs text-gray-400 dark:text-gray-500 mt-1;
+    }
+
+    /* ===== Tarjeta y secciones de formulario ===== */
+    .form-card {
+        @apply bg-white dark:bg-card-bg rounded-2xl shadow-xs
+            border border-gray-200/80 dark:border-gray-700/60 p-4 sm:p-6 space-y-6;
+    }
+    .form-section-title {
+        @apply text-sm font-semibold text-gray-900 dark:text-white
+            border-b border-gray-100 dark:border-gray-700/60 pb-3 flex items-center gap-2;
+    }
+    .form-grid {
+        @apply grid grid-cols-1 gap-4;
+    }
+    .form-grid-2 {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+    }
+    .form-grid-3 {
+        @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4;
+    }
+
+    /* ===== Detalle solo-lectura: contenedor (1100–1200px, gutter 24–40px) ===== */
+    .detail-container {
+        @apply w-full mx-auto;
+        max-width: 1150px;
+        padding-inline: clamp(1.5rem, 1.5rem + 2vw, 2.5rem);
+    }
+    .detail-card {
+        @apply bg-white dark:bg-card-bg rounded-2xl shadow-xs
+            border border-gray-200/80 dark:border-gray-700/60;
+        padding: clamp(1.5rem, 1.5rem + 1vw, 2rem);
+    }
+    .detail-section + .detail-section {
+        margin-top: 2rem; /* 32px entre secciones */
+    }
+    .detail-section-title {
+        @apply text-xs font-semibold text-gray-500 dark:text-gray-400
+            border-b border-gray-100 dark:border-gray-700/60 pb-2 mb-4;
+    }
+    /* Grid fluida: 4 cols en wide, 3/2/1 al estrechar (min 240px por campo) */
+    .detail-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .detail-span-2 {
+        grid-column: span 2;
+    }
+    @media (max-width: 640px) {
+        .detail-span-2 {
+            grid-column: span 1;
+        }
+    }
+    .detail-label {
+        @apply text-sm text-gray-600 dark:text-gray-400 mb-1;
+    }
+    .detail-value {
+        @apply text-lg font-semibold text-gray-900 dark:text-white;
+    }
+    .detail-actions {
+        @apply flex gap-4 pt-6 mt-8 border-t border-gray-100 dark:border-gray-700/60;
+    }
+
+    /* ===== Sistema dark estándar para editores de entidad (Inventario): tokens compartidos ===== */
+    .ui-card {
+        @apply bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm dark:shadow-none;
+    }
+    .ui-title {
+        @apply block w-full bg-transparent border-0 border-b-2 border-gray-200 dark:border-white/15
+            px-0 py-2 text-2xl font-bold text-gray-900 dark:text-white
+            placeholder-gray-400 dark:placeholder-gray-500
+            transition-colors focus:ring-0 focus:border-cyan-400 dark:focus:border-cyan-400;
+    }
+    .ui-label {
+        @apply block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2;
+    }
+    .ui-input {
+        @apply block w-full rounded-md border border-gray-300 dark:border-white/10
+            bg-white dark:bg-white/5 px-3.5 py-2.5 text-sm
+            text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
+            transition-all focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20;
+    }
+    .ui-check {
+        @apply w-4 h-4 rounded border-gray-300 dark:border-white/20 accent-cyan-400 focus:ring-2 focus:ring-cyan-400/30;
+    }
+    .ui-tab {
+        @apply px-5 py-2.5 text-sm font-medium cursor-pointer
+            border-b-2 border-transparent text-gray-500 dark:text-gray-400
+            hover:text-gray-900 dark:hover:text-gray-200 transition-colors bg-transparent;
+    }
+    .ui-tab-active {
+        @apply border-cyan-400 text-slate-900 dark:text-white;
+    }
+    .ui-thumb {
+        @apply w-32 h-32 rounded-xl bg-gray-100 dark:bg-white/5
+            border border-gray-200 dark:border-white/10
+            flex items-center justify-center relative overflow-hidden shrink-0;
+    }
+    .btn-outline {
+        @apply inline-flex items-center justify-center gap-2 min-h-[40px] px-4 rounded-xl
+            border border-gray-300 dark:border-white/20
+            text-gray-700 dark:text-gray-300 font-semibold text-sm transition-colors
+            hover:bg-gray-50 dark:hover:bg-white/5
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400;
+    }
+
+    /* ===== Botones (altura ≥40px, radios y focos consistentes) ===== */
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 min-h-[40px] px-4
+            bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl
+            font-semibold text-sm shadow-sm transition-all
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 min-h-[40px] px-4
+            bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl
+            font-semibold text-sm transition-colors hover:bg-gray-200 dark:hover:bg-gray-600
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2;
+    }
+    .btn-danger-soft {
+        @apply inline-flex items-center justify-center gap-2 min-h-[40px] px-4
+            bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 rounded-xl
+            font-semibold text-sm transition-colors hover:bg-rose-100 dark:hover:bg-rose-900/40
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2;
+    }
+}
+
 /* Custom sleek scrollbar for sidebar & panels */
 .custom-scrollbar::-webkit-scrollbar {
     width: 5px;

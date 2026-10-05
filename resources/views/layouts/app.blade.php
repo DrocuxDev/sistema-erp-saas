@@ -18,7 +18,7 @@
         <title>{{ config('app.name', 'JHardSystex ERP') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700|jetbrains-mono:400,500,600&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
@@ -45,7 +45,7 @@
 
                 @isset($header)
                     <header class="bg-white dark:bg-darker-bg border-b border-gray-200 dark:border-gray-700/60 shadow-xs transition-colors duration-200">
-                        <div class="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+                        <div class="page-container py-4 sm:py-6">
                             {{ $header }}
                         </div>
                     </header>
@@ -58,5 +58,8 @@
         </div>
 
         @stack('scripts')
+
+        <link rel="stylesheet" href="{{ asset('css/toast-dialog.css') }}">
+        <script src="{{ asset('js/toast-dialog.js') }}"></script>
     </body>
 </html>

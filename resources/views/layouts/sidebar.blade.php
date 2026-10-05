@@ -1,4 +1,4 @@
-<aside 
+<aside id="main-sidebar"
     :class="{
         'translate-x-0': sidebarOpen,
         '-translate-x-full': !sidebarOpen,
@@ -17,18 +17,19 @@
 
         <div class="flex items-center gap-1">
             {{-- Botón Ocultar en Desktop --}}
-            <button @click="sidebarCollapsed = true" 
-                    title="Ocultar menú lateral"
-                    class="hidden lg:flex p-1.5 text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded-lg transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button type="button" @click="sidebarCollapsed = true"
+                    aria-label="Ocultar menú lateral" title="Ocultar menú lateral" aria-controls="main-sidebar"
+                    class="hidden lg:inline-flex p-1.5 text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded-lg transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
                 </svg>
             </button>
 
             {{-- Botón Cerrar en Móvil --}}
-            <button @click="sidebarOpen = false" 
-                    class="lg:hidden p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button type="button" @click="sidebarOpen = false"
+                    aria-label="Cerrar menú lateral" title="Cerrar menú lateral"
+                    class="flex lg:hidden p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
@@ -43,14 +44,14 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                 </svg>
-                <span>Dashboard</span>
+                <span>Panel comercial</span>
             </x-nav-link>
         @endif
 
         {{-- SECCIÓN MAESTROS --}}
         @if(auth()->user()->tieneModulo('proveedores') || auth()->user()->tieneModulo('clientes') || auth()->user()->tieneModulo('productos') || auth()->user()->tieneModulo('inventario'))
             <div class="pt-4">
-                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Maestros & Catálogo</p>
+                <p class="px-3 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400">Maestros y Catálogo</p>
                 
                 @if(auth()->user()->tieneModulo('proveedores'))
                     <x-nav-link :href="route('proveedores.index')" :active="request()->routeIs('proveedores.*')">
@@ -91,9 +92,9 @@
         @endif
 
         {{-- SECCIÓN VENTAS --}}
-        @if(auth()->user()->tieneModulo('ordenes_compra_cliente') || auth()->user()->tieneModulo('cotizaciones') || auth()->user()->tieneModulo('ventas'))
+        @if(auth()->user()->tieneModulo('ordenes_compra_cliente') || auth()->user()->tieneModulo('cotizaciones') || auth()->user()->tieneModulo('ventas') || auth()->user()->tieneModulo('comprobantes'))
             <div class="pt-4">
-                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Flujo Comercial</p>
+                <p class="px-3 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400">Flujo Comercial</p>
 
                 @if(auth()->user()->tieneModulo('ordenes_compra_cliente'))
                     <x-nav-link :href="route('ordenes-compra-cliente.index')" :active="request()->routeIs('ordenes-compra-cliente.*')">
@@ -121,13 +122,28 @@
                         <span>Ventas (V001)</span>
                     </x-nav-link>
                 @endif
+
+                @if(auth()->user()->tieneModulo('comprobantes'))
+                    <x-nav-link :href="route('comprobantes.index')" :active="request()->routeIs('comprobantes.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Comprobantes (F/B)</span>
+                    </x-nav-link>
+                    <x-nav-link :href="route('guias-remision.index')" :active="request()->routeIs('guias-remision.*')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span>Guías (T001)</span>
+                    </x-nav-link>
+                @endif
             </div>
         @endif
 
         {{-- SECCIÓN COMPRAS --}}
         @if(auth()->user()->tieneModulo('compras'))
             <div class="pt-4">
-                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Abastecimiento</p>
+                <p class="px-3 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400">Abastecimiento</p>
 
                 <x-nav-link :href="route('ordenes-compra.index')" :active="request()->routeIs('ordenes-compra.*')">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,13 +151,20 @@
                     </svg>
                     <span>O/C a Proveedor (OC01)</span>
                 </x-nav-link>
+
+                <x-nav-link :href="route('compras.index')" :active="request()->routeIs('compras.*')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                    <span>Recepción / Compras</span>
+                </x-nav-link>
             </div>
         @endif
 
         {{-- SECCIÓN ADMINISTRACIÓN --}}
         @if(auth()->user()->tieneModulo('usuarios') || auth()->user()->tieneModulo('configuracion') || auth()->user()->tieneModulo('auditoria'))
             <div class="pt-4">
-                <p class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Administración</p>
+                <p class="px-3 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400">Administración</p>
                 
                 @if(auth()->user()->tieneModulo('usuarios'))
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*') || request()->routeIs('roles.*')">

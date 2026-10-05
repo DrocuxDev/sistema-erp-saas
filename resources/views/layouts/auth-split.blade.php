@@ -8,85 +8,57 @@
         <title>{{ $title ?? 'Iniciar sesión' }} — JHARDSYSTEX</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700|jetbrains-mono:400,500,600&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen flex flex-col lg:flex-row">
             {{-- Panel izquierdo --}}
-            <aside class="relative hidden lg:flex lg:w-[42%] xl:w-[40%] bg-brand-dark flex-col overflow-hidden">
-                <svg class="absolute inset-0 w-full h-full opacity-30 pointer-events-none" viewBox="0 0 800 900" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <circle cx="120" cy="180" r="4" fill="#2BB099"/>
-                    <circle cx="280" cy="120" r="4" fill="#2BB099"/>
-                    <circle cx="420" cy="200" r="4" fill="#2BB099"/>
-                    <circle cx="560" cy="140" r="4" fill="#2BB099"/>
-                    <circle cx="680" cy="220" r="4" fill="#2BB099"/>
-                    <circle cx="200" cy="340" r="4" fill="#2BB099"/>
-                    <circle cx="380" cy="380" r="4" fill="#2BB099"/>
-                    <circle cx="520" cy="320" r="4" fill="#2BB099"/>
-                    <circle cx="640" cy="400" r="4" fill="#2BB099"/>
-                    <circle cx="160" cy="520" r="4" fill="#2BB099"/>
-                    <circle cx="320" cy="480" r="4" fill="#2BB099"/>
-                    <circle cx="480" cy="540" r="4" fill="#2BB099"/>
-                    <circle cx="600" cy="500" r="4" fill="#2BB099"/>
-                    <circle cx="240" cy="660" r="4" fill="#2BB099"/>
-                    <circle cx="400" cy="620" r="4" fill="#2BB099"/>
-                    <circle cx="540" cy="680" r="4" fill="#2BB099"/>
-                    <line x1="120" y1="180" x2="280" y2="120" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="280" y1="120" x2="420" y2="200" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="420" y1="200" x2="560" y2="140" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="560" y1="140" x2="680" y2="220" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="120" y1="180" x2="200" y2="340" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="200" y1="340" x2="380" y2="380" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="380" y1="380" x2="520" y2="320" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="520" y1="320" x2="640" y2="400" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="200" y1="340" x2="160" y2="520" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="160" y1="520" x2="320" y2="480" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="320" y1="480" x2="480" y2="540" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="480" y1="540" x2="600" y2="500" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="160" y1="520" x2="240" y2="660" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="240" y1="660" x2="400" y2="620" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="400" y1="620" x2="540" y2="680" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="680" y1="220" x2="640" y2="400" stroke="#2BB099" stroke-width="1"/>
-                    <line x1="420" y1="200" x2="380" y2="380" stroke="#2BB099" stroke-width="1"/>
-                </svg>
+            <aside class="relative hidden lg:flex lg:w-[42%] xl:w-[40%] bg-darker-bg border-r border-slate-800/80 flex-col overflow-hidden">
+                {{-- Fondo técnico arquitectónico sutil (reemplaza constelación de IA) --}}
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0); background-size: 24px 24px;"></div>
 
                 <div class="relative z-10 flex flex-col h-full p-10 xl:p-12">
                     <div class="flex items-center gap-3">
-                        <svg class="h-8 w-8 text-white shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <rect x="3" y="5" width="26" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M11 24h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M16 23v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M8 14h16" stroke="#2BB099" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M8 14c2-3 4-4 8-4s6 1 8 4" stroke="#2BB099" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                        <span class="text-white font-bold text-lg tracking-[0.2em] uppercase border-b border-white/40 pb-0.5">JHARDSYSTEX</span>
+                        <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-sm font-mono">
+                            JH
+                        </div>
+                        <div>
+                            <span class="text-white font-bold text-base tracking-tight block">JHardSystex S.A.C.</span>
+                            <span class="text-xs text-slate-400 font-mono">Sistema ERP Empresarial</span>
+                        </div>
                     </div>
 
-                    <div class="mt-auto pb-8">
-                        <p class="text-brand-teal text-xs font-semibold tracking-[0.25em] uppercase mb-4">Panel interno</p>
-                        <h1 class="text-white text-3xl xl:text-4xl font-bold leading-tight max-w-md">
-                            Un solo acceso para todos tus sistemas
+                    <div class="mt-auto pb-8 space-y-4">
+                        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-mono text-cyan-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span>Entorno Corporativo Seguro</span>
+                        </div>
+                        <h1 class="text-white text-3xl xl:text-4xl font-bold tracking-tight leading-tight max-w-md">
+                            Control Comercial y Operaciones
                         </h1>
-                        <p class="text-gray-400 text-sm xl:text-base mt-4 max-w-sm leading-relaxed">
-                            Gestiona operaciones, proyectos y equipos desde una sola cuenta corporativa.
+                        <p class="text-slate-400 text-sm mt-3 max-w-sm leading-relaxed">
+                            Plataforma centralizada para facturación electrónica, cotizaciones, órdenes de compra e inventario valorizado.
                         </p>
+                        <div class="pt-4 border-t border-slate-800/60 text-[11px] text-slate-500 flex items-center gap-2 font-mono">
+                            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span>Acceso restringido a personal autorizado. Sesiones auditadas.</span>
+                        </div>
                     </div>
                 </div>
             </aside>
 
             {{-- Panel derecho --}}
-            <main class="flex-1 flex flex-col min-h-screen bg-white">
-                <div class="lg:hidden bg-brand-dark px-6 py-5 flex items-center gap-3">
-                    <svg class="h-7 w-7 text-white shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <rect x="3" y="5" width="26" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
-                        <path d="M11 24h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M16 23v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M8 14h16" stroke="#2BB099" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M8 14c2-3 4-4 8-4s6 1 8 4" stroke="#2BB099" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                    <span class="text-white font-bold text-sm tracking-[0.15em] uppercase">JHARDSYSTEX</span>
+            <main class="flex-1 flex flex-col min-h-screen bg-white dark:bg-card-bg">
+                <div class="lg:hidden bg-darker-bg px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs font-mono">
+                            JH
+                        </div>
+                        <span class="text-white font-bold text-sm tracking-tight">JHardSystex ERP</span>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 font-mono">● Conexión Segura</span>
                 </div>
 
                 <div class="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 py-10">
@@ -100,5 +72,8 @@
                 </footer>
             </main>
         </div>
+
+        <link rel="stylesheet" href="{{ asset('css/toast-dialog.css') }}">
+        <script src="{{ asset('js/toast-dialog.js') }}"></script>
     </body>
 </html>

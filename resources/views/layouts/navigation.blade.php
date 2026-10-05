@@ -2,14 +2,24 @@
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center gap-3 sm:gap-6">
             
-            {{-- Left Side: Hamburger Button & Buscador Rápido de Módulos con SVG --}}
+            {{-- Left Side: controles del menú y buscador rápido de módulos --}}
             <div class="flex items-center gap-3 flex-1 max-w-xl">
-                {{-- Hamburger Button (Toggle Sidebar on Mobile & Desktop) --}}
-                <button @click="if (window.innerWidth >= 1024) { sidebarCollapsed = !sidebarCollapsed } else { sidebarOpen = !sidebarOpen }" 
-                        title="Alternar menú lateral"
-                        class="p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded-xl transition-all shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {{-- Móvil y tablet: abre el panel superpuesto. --}}
+                <button type="button" @click="sidebarOpen = !sidebarOpen"
+                        :aria-expanded="sidebarOpen.toString()" aria-controls="main-sidebar"
+                        aria-label="Alternar menú lateral" title="Alternar menú lateral"
+                        class="flex lg:hidden p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded-xl transition-all shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+
+                {{-- Escritorio: permite recuperar el panel después de colapsarlo. --}}
+                <button type="button" x-show="sidebarCollapsed" x-cloak @click="sidebarCollapsed = false"
+                        aria-label="Mostrar menú lateral" title="Mostrar menú lateral" aria-controls="main-sidebar"
+                        class="hidden lg:inline-flex p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-gray-800/80 rounded-xl transition-all shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
                 </button>
 
@@ -21,7 +31,7 @@
                     if ($user->tieneModulo('dashboard')) {
                         $modulosDisponibles[] = [
                             'id' => 'dashboard',
-                            'nombre' => 'Dashboard Comercial', 
+                            'nombre' => 'Panel comercial',
                             'categoria' => 'Principal', 
                             'ruta' => route('dashboard'), 
                             'svg' => '<svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>', 
@@ -64,7 +74,7 @@
                             'nombre' => 'O/C a Proveedor (OC01)', 
                             'categoria' => 'Abastecimiento', 
                             'ruta' => route('ordenes-compra.index'), 
-                            'svg' => '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>', 
+                            'svg' => '<svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>',
                             'desc' => 'Órdenes de compra a proveedores'
                         ];
                     }
@@ -132,7 +142,7 @@
                             'nombre' => 'Usuarios y Roles', 
                             'categoria' => 'Administración', 
                             'ruta' => route('users.index'), 
-                            'svg' => '<svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>', 
+                            'svg' => '<svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>',
                             'desc' => 'Permisos y control de acceso'
                         ];
                     }
@@ -150,7 +160,7 @@
                         'id' => 'perfil',
                         'nombre' => 'Mi Perfil', 
                         'categoria' => 'Cuenta', 
-                        'ruta' => route('profile.edit'), 
+                        'ruta' => route('profile.show'),
                         'svg' => '<svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>', 
                         'desc' => 'Datos personales y contraseña'
                     ];
@@ -184,8 +194,8 @@
                     
                     {{-- Input buscador con diseño ejecutivo --}}
                     <div class="relative flex items-center">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500" aria-hidden="true">
+                            <svg class="w-4 h-4 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
@@ -198,8 +208,8 @@
                                @keydown.arrow-up.prevent="selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length"
                                @keydown.enter.prevent="navigate()"
                                @keydown.escape="open = false; $refs.searchInput.blur()"
-                               placeholder="Buscar o elegir módulo..." 
-                               class="w-full pl-9 pr-14 py-2 bg-gray-100 dark:bg-card-bg hover:bg-gray-100/90 dark:hover:bg-darker-bg text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700/60 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-2xs">
+                                placeholder="Buscar o elegir módulo..."
+                                class="w-full min-h-[40px] pl-10 pr-14 py-2 bg-gray-100 dark:bg-card-bg hover:bg-gray-100/90 dark:hover:bg-darker-bg text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700/60 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-2xs">
                         
                         <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
                             <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-semibold text-gray-400 dark:text-gray-500 bg-white dark:bg-darker-bg border border-gray-200 dark:border-gray-700/80 rounded-md">
@@ -219,7 +229,7 @@
                          class="absolute left-0 mt-2 w-full sm:w-96 max-h-96 bg-white dark:bg-card-bg rounded-2xl border border-gray-200 dark:border-gray-700/80 shadow-2xl overflow-y-auto custom-scrollbar z-50 p-2"
                          style="display: none;">
                         
-                        <div class="px-3 py-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex justify-between items-center border-b border-gray-100 dark:border-gray-700/50 pb-2 mb-1">
+                        <div class="px-3 py-1.5 text-[10px] font-medium text-gray-400 dark:text-gray-500 flex justify-between items-center border-b border-gray-100 dark:border-gray-700/50 pb-2 mb-1">
                             <span>Módulos del Sistema</span>
                             <span x-text="filtered.length + ' disponibles'"></span>
                         </div>
@@ -257,25 +267,32 @@
 
             {{-- Right Side: Theme Toggle & User Profile --}}
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                {{-- Theme Toggle --}}
-                <button @click="darkMode = !darkMode" 
+                {{-- Theme Toggle (SVG sol/luna con transición, 40px) --}}
+                <button @click="darkMode = !darkMode"
+                        :aria-pressed="darkMode.toString()"
+                        aria-label="Cambiar entre modo claro y oscuro"
                         title="Cambiar a modo claro/oscuro"
-                        class="p-2 bg-gray-100 dark:bg-card-bg text-gray-600 dark:text-cyan-400 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700/80 transition-colors border border-gray-200/80 dark:border-gray-700/60">
-                    <svg x-show="!darkMode" class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                        class="relative h-10 w-10 shrink-0 inline-flex items-center justify-center bg-gray-100 dark:bg-card-bg text-gray-600 dark:text-cyan-400 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700/80 transition-colors border border-gray-200/80 dark:border-gray-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500">
+                    <svg x-show="!darkMode"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -rotate-90 scale-75"
+                         x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                         class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
                     </svg>
-                    <svg x-show="darkMode" class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                    <svg x-show="darkMode" x-cloak
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 rotate-90 scale-75"
+                         x-transition:enter-end="opacity-100 rotate-0 scale-100"
+                         class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                 </button>
 
                 {{-- Profile Dropdown --}}
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center gap-2 px-2.5 py-1.5 bg-gray-100 dark:bg-card-bg text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700/80 transition-colors border border-gray-200/80 dark:border-gray-700/60">
-                            <div class="w-7 h-7 bg-gradient-to-tr from-cyan-600 to-cyan-400 rounded-lg flex items-center justify-center font-bold text-xs text-white shadow-xs">
-                                {{ substr(Auth::user()->name, 0, 1) }}
-                            </div>
+                        <button class="inline-flex items-center gap-2.5 min-h-[40px] px-3 bg-gray-100 dark:bg-card-bg text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700/80 transition-colors border border-gray-200/80 dark:border-gray-700/60">
                             <div class="text-left text-xs hidden sm:block">
                                 <div class="font-bold leading-tight">{{ Auth::user()->name }}</div>
                                 <div class="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold leading-tight capitalize">{{ Auth::user()->rol }}</div>
@@ -287,7 +304,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.show')">
                             {{ __('Mi Perfil') }}
                         </x-dropdown-link>
 

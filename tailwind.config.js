@@ -13,7 +13,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['"Plus Jakarta Sans"', 'Figtree', ...defaultTheme.fontFamily.sans],
+                mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
             },
             colors: {
                 brand: {
@@ -32,10 +33,11 @@ export default {
                 'cyan-primary': '#06B6D4',
                 'cyan-accent': '#22D3EE',
                 'emerald-accent': '#10B981',
-                'purple-primary': '#06B6D4', // Mapeo de compatibilidad hacia Cyan Neón
-                'purple-light': '#38BDF8',
-                'pink-accent': '#06B6D4',
                 'blue-accent': '#0284C7',
+            },
+            boxShadow: {
+                '2xs': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
+                'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
             },
         },
     },

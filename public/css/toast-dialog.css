@@ -1,0 +1,154 @@
+:root {
+  --td-radius: 12px;
+  --td-font: inherit;
+  --td-shadow: 0 10px 30px -10px rgba(15,23,42,.25), 0 4px 6px -2px rgba(15,23,42,.08);
+  --td-bg: #ffffff;
+  --td-text: #0f172a;
+  --td-text-muted: #64748b;
+  --td-border: #e2e8f0;
+  --td-overlay: rgba(15,23,42,.5);
+
+  --td-success: #16a34a;   --td-success-bg: #f0fdf4;
+  --td-error: #dc2626;     --td-error-bg: #fef2f2;
+  --td-warning: #d97706;   --td-warning-bg: #fffbeb;
+  --td-info: #2563eb;      --td-info-bg: #eff6ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --td-bg: #1e293b; --td-text: #f1f5f9; --td-text-muted: #94a3b8; --td-border: #334155;
+    --td-overlay: rgba(0,0,0,.6);
+    --td-success-bg: #052e16; --td-error-bg: #450a0a; --td-warning-bg: #451a03; --td-info-bg: #0c1e3d;
+  }
+}
+
+/*
+ * Adaptación ERP: el tema oscuro se controla con la clase .dark en <html>
+ * (toggle manual), no con prefers-color-scheme. Se espejan los mismos valores.
+ */
+.dark {
+  --td-bg: #1e293b; --td-text: #f1f5f9; --td-text-muted: #94a3b8; --td-border: #334155;
+  --td-overlay: rgba(0,0,0,.6);
+  --td-success-bg: #052e16; --td-error-bg: #450a0a; --td-warning-bg: #451a03; --td-info-bg: #0c1e3d;
+}
+
+.toast-container, .toast-container *, .dialog, .dialog *, .dialog-overlay { box-sizing: border-box; }
+
+/* ===== Toast ===== */
+.toast-container {
+  position: fixed; z-index: 9999;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 16px; pointer-events: none;
+  width: 100%; max-width: 380px;
+}
+
+@media (max-width: 480px) {
+  .toast-container { max-width: 100%; padding: 12px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+
+.toast {
+  pointer-events: auto; position: relative;
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px; border-radius: var(--td-radius);
+  background: var(--td-bg); border: 1px solid var(--td-border);
+  border-left: 4px solid var(--toast-color, var(--td-info));
+  box-shadow: var(--td-shadow); font-family: var(--td-font);
+  overflow: hidden; animation: toast-in .3s cubic-bezier(.16,1,.3,1);
+}
+.toast.is-leaving { animation: toast-out .25s ease-in forwards; }
+
+.toast--solid { background: var(--toast-color, var(--td-info)); border: none; color: #fff; }
+.toast--solid .toast__title { color: #fff; }
+.toast--solid .toast__message { color: rgba(255,255,255,.85); }
+.toast--solid .toast__icon, .toast--solid .toast__close { color: #fff; }
+
+.toast--success { --toast-color: var(--td-success); }
+.toast--error   { --toast-color: var(--td-error); }
+.toast--warning { --toast-color: var(--td-warning); }
+.toast--info    { --toast-color: var(--td-info); }
+
+.toast:not(.toast--solid).toast--success { background: var(--td-success-bg); }
+.toast:not(.toast--solid).toast--error   { background: var(--td-error-bg); }
+.toast:not(.toast--solid).toast--warning { background: var(--td-warning-bg); }
+.toast:not(.toast--solid).toast--info    { background: var(--td-info-bg); }
+
+.toast__icon { flex-shrink: 0; width: 20px; height: 20px; color: var(--toast-color, var(--td-info)); }
+.toast__icon svg { width: 100%; height: 100%; }
+.toast__body { flex: 1; min-width: 0; }
+.toast__title { font-weight: 600; font-size: .9rem; color: var(--td-text); margin: 0 0 2px; }
+.toast__message { font-size: .825rem; color: var(--td-text-muted); margin: 0; line-height: 1.4; }
+
+.toast__close {
+  flex-shrink: 0; background: none; border: none; cursor: pointer;
+  color: var(--td-text-muted); padding: 2px; border-radius: 4px;
+  display: flex; transition: background .15s, color .15s;
+}
+.toast__close:hover { background: rgba(0,0,0,.06); color: var(--td-text); }
+.toast--solid .toast__close:hover { background: rgba(255,255,255,.15); color: #fff; }
+.toast__close svg { width: 14px; height: 14px; }
+
+.toast__progress {
+  position: absolute; left: 0; bottom: 0; height: 3px;
+  background: var(--toast-color, var(--td-info)); opacity: .4;
+  animation: toast-progress linear forwards;
+}
+.toast--solid .toast__progress { background: rgba(255,255,255,.6); opacity: 1; }
+
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes toast-out { to { opacity: 0; transform: translateX(20px) scale(.96); } }
+@keyframes toast-progress { from { width: 100%; } to { width: 0%; } }
+
+/* ===== Dialog ===== */
+.dialog-overlay {
+  position: fixed; inset: 0; background: var(--td-overlay); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  z-index: 10000; opacity: 0; animation: dialog-overlay-in .2s ease forwards;
+}
+.dialog-overlay.is-leaving { animation: dialog-overlay-out .2s ease forwards; }
+
+.dialog {
+  background: var(--td-bg); border-radius: 16px; box-shadow: var(--td-shadow);
+  width: 100%; max-width: 420px; padding: 28px; font-family: var(--td-font);
+  transform: scale(.95) translateY(8px); opacity: 0;
+  animation: dialog-in .25s cubic-bezier(.16,1,.3,1) forwards;
+}
+.dialog-overlay.is-leaving .dialog { animation: dialog-out .2s ease forwards; }
+
+.dialog__title { font-size: 1.15rem; font-weight: 700; color: var(--td-text); margin: 0 0 8px; }
+.dialog__description { font-size: .9rem; color: var(--td-text-muted); line-height: 1.5; margin: 0 0 24px; }
+.dialog__actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+.dialog__btn {
+  border: none; border-radius: 999px; padding: 10px 20px; font-size: .875rem;
+  font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: transform .15s, background .15s, box-shadow .15s;
+}
+.dialog__btn:active { transform: scale(.97); }
+.dialog__btn--cancel { background: transparent; border: 1px solid var(--td-border); color: var(--td-text); }
+.dialog__btn--cancel:hover { background: rgba(0,0,0,.04); }
+.dialog__btn--confirm { background: var(--td-info); color: #fff; }
+.dialog__btn--confirm:hover { box-shadow: 0 4px 14px rgba(37,99,235,.35); }
+.dialog--danger .dialog__btn--confirm { background: var(--td-error); }
+.dialog--danger .dialog__btn--confirm:hover { box-shadow: 0 4px 14px rgba(220,38,38,.35); }
+
+@keyframes dialog-overlay-in { to { opacity: 1; } }
+@keyframes dialog-overlay-out { to { opacity: 0; } }
+@keyframes dialog-in { to { opacity: 1; transform: none; } }
+@keyframes dialog-out { to { opacity: 0; transform: scale(.95) translateY(8px); } }
+
+body.dialog-open { overflow: hidden; }
+
+@media (max-width: 480px) {
+  .dialog-overlay { align-items: flex-end; padding: 0; }
+  .dialog {
+    max-width: 100%; border-radius: 20px 20px 0 0;
+    padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    animation: dialog-sheet-in .3s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .dialog-overlay.is-leaving .dialog { animation: dialog-sheet-out .25s ease forwards; }
+  .dialog__actions { flex-direction: column-reverse; }
+  .dialog__btn { width: 100%; padding: 12px 20px; }
+}
+@keyframes dialog-sheet-in { to { transform: translateY(0); } }
+@keyframes dialog-sheet-out { to { transform: translateY(100%); } }
