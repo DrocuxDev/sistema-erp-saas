@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auditoria;
 use App\Models\Modulo;
 use App\Models\Rol;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -20,8 +21,8 @@ class UserController extends Controller
             $busqueda = trim($request->usuario);
             $query->where(function ($q) use ($busqueda) {
                 $q->where('name', 'like', "%{$busqueda}%")
-                  ->orWhere('email', 'like', "%{$busqueda}%")
-                  ->orWhere('username', 'like', "%{$busqueda}%");
+                    ->orWhere('email', 'like', "%{$busqueda}%")
+                    ->orWhere('username', 'like', "%{$busqueda}%");
             });
         }
 
@@ -61,6 +62,8 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless($request->user()->isAdministrador(), 403);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'string', 'email', 'max:150', 'unique:users,email'],
@@ -71,27 +74,37 @@ class UserController extends Controller
             'is_superadmin' => ['nullable', 'boolean'],
             'activo' => ['nullable', 'boolean'],
             'modulos' => ['nullable', 'array'],
+            'modulos.*' => ['integer', 'exists:modulos,id'],
         ]);
 
-        $rol = !empty($validated['rol_id']) ? Rol::find($validated['rol_id']) : null;
-        $esSuperAdmin = !empty($validated['is_superadmin']) && auth()->user()->isSuperAdmin();
+        $rol = ! empty($validated['rol_id']) ? Rol::find($validated['rol_id']) : null;
+        $this->autorizarAsignacion($request, $rol);
+        $esSuperAdmin = ! empty($validated['is_superadmin']) && auth()->user()->isSuperAdmin();
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'username' => !empty($validated['username']) ? $validated['username'] : $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'rol' => ($esSuperAdmin || $rol?->slug === 'superadmin' || $rol?->slug === 'administracion') ? 'administrador' : 'trabajador',
-            'rol_id' => $validated['rol_id'] ?? null,
-            'punto_emision' => $validated['punto_emision'] ?? 'OFICINA',
-            'is_superadmin' => $esSuperAdmin,
-            'activo' => $request->has('activo') ? (bool) $request->activo : true,
-        ]);
+        $user = DB::transaction(function () use ($request, $validated, $rol, $esSuperAdmin) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'username' => ! empty($validated['username']) ? $validated['username'] : $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'rol' => ($esSuperAdmin || $rol?->slug === 'superadmin' || $rol?->slug === 'administracion') ? 'administrador' : 'trabajador',
+                'rol_id' => $validated['rol_id'] ?? null,
+                'punto_emision' => $validated['punto_emision'] ?? 'OFICINA',
+                'is_superadmin' => $esSuperAdmin,
+                'activo' => $request->has('activo') ? (bool) $request->activo : true,
+            ]);
 
-        // Guardar excepciones directas de módulos si se enviaron
-        if ($request->has('modulos')) {
-            $user->modulosExcepciones()->sync($request->modulos);
-        }
+            if ($request->has('modulos')) {
+                $user->modulosExcepciones()->sync($validated['modulos'] ?? []);
+                Auditoria::create([
+                    'tabla' => 'user_modulo', 'registro_id' => $user->id, 'usuario_id' => auth()->id(),
+                    'accion' => 'edicion', 'detalle' => 'Permisos individuales asignados al usuario',
+                    'datos_anteriores' => [], 'datos_nuevos' => ['modulos' => $validated['modulos'] ?? []],
+                ]);
+            }
+
+            return $user;
+        });
 
         return redirect()->route('users.index')
             ->with('success', "Usuario '{$user->name}' registrado exitosamente.");
@@ -99,8 +112,10 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        abort_unless(auth()->user()->isAdministrador(), 403);
+        abort_if($user->is(auth()->user()), 403, 'Use su perfil para editar sus datos personales.');
         // Nadie que no sea SuperAdmin puede editar a un SuperAdmin
-        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+        if ($user->isSuperAdmin() && ! auth()->user()->isSuperAdmin()) {
             abort(403, 'Solo el Administrador Principal (SuperAdmin) puede modificar esta cuenta.');
         }
 
@@ -113,25 +128,29 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        abort_unless($request->user()->isAdministrador(), 403);
+        abort_unless($request->user()->puedeGestionarA($user), 403);
         // Protección de SuperAdmin Base
-        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+        if ($user->isSuperAdmin() && ! auth()->user()->isSuperAdmin()) {
             abort(403, 'No tiene permisos para modificar al Administrador Principal.');
         }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'string', 'email', 'max:150', 'unique:users,email,' . $user->id],
-            'username' => ['nullable', 'string', 'max:100', 'unique:users,username,' . $user->id],
+            'email' => ['required', 'string', 'email', 'max:150', 'unique:users,email,'.$user->id],
+            'username' => ['nullable', 'string', 'max:100', 'unique:users,username,'.$user->id],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'rol_id' => ['nullable', 'exists:roles,id'],
             'punto_emision' => ['nullable', 'string', 'max:100'],
             'is_superadmin' => ['nullable', 'boolean'],
             'activo' => ['nullable', 'boolean'],
             'modulos' => ['nullable', 'array'],
+            'modulos.*' => ['integer', 'exists:modulos,id'],
         ]);
 
-        $rol = !empty($validated['rol_id']) ? Rol::find($validated['rol_id']) : null;
-        
+        $rol = ! empty($validated['rol_id']) ? Rol::find($validated['rol_id']) : $user->rolPersonalizado;
+        $this->autorizarAsignacion($request, $rol, $user);
+
         // Evitar que se desmarque a sí mismo como SuperAdmin si es el único
         $esSuperAdmin = $user->isSuperAdmin();
         if (auth()->user()->isSuperAdmin() && $user->id !== auth()->id() && isset($validated['is_superadmin'])) {
@@ -141,7 +160,7 @@ class UserController extends Controller
         $datosActualizar = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'username' => !empty($validated['username']) ? $validated['username'] : $user->username,
+            'username' => ! empty($validated['username']) ? $validated['username'] : $user->username,
             'rol' => ($esSuperAdmin || $rol?->slug === 'superadmin' || $rol?->slug === 'administracion') ? 'administrador' : 'trabajador',
             'rol_id' => $validated['rol_id'] ?? $user->rol_id,
             'punto_emision' => $validated['punto_emision'] ?? ($user->punto_emision ?: 'OFICINA'),
@@ -153,12 +172,20 @@ class UserController extends Controller
             $datosActualizar['password'] = Hash::make($validated['password']);
         }
 
-        $user->update($datosActualizar);
+        DB::transaction(function () use ($request, $user, $datosActualizar, $validated) {
+            $user->update($datosActualizar);
 
-        // Actualizar módulos específicos
-        if ($request->has('modulos_personalizados')) {
-            $user->modulosExcepciones()->sync($request->modulos ?? []);
-        }
+            if ($request->has('modulos_personalizados')) {
+                $anteriores = $user->modulosExcepciones()->pluck('modulos.id')->all();
+                $user->modulosExcepciones()->sync($validated['modulos'] ?? []);
+                Auditoria::create([
+                    'tabla' => 'user_modulo', 'registro_id' => $user->id, 'usuario_id' => auth()->id(),
+                    'accion' => 'edicion', 'detalle' => 'Permisos individuales del usuario modificados',
+                    'datos_anteriores' => ['modulos' => $anteriores],
+                    'datos_nuevos' => ['modulos' => $validated['modulos'] ?? []],
+                ]);
+            }
+        });
 
         return redirect()->route('users.index')
             ->with('success', "Usuario '{$user->name}' actualizado correctamente.");
@@ -179,7 +206,7 @@ class UserController extends Controller
         }
 
         // 3. Validar jerarquía
-        if (!auth()->user()->puedeGestionarA($user)) {
+        if (! auth()->user()->puedeGestionarA($user)) {
             return redirect()->route('users.index')
                 ->with('error', 'No tiene los privilegios necesarios para eliminar a este usuario.');
         }
@@ -196,12 +223,26 @@ class UserController extends Controller
      */
     public function toggleActivo(User $user)
     {
+        abort_unless(auth()->user()->puedeGestionarA($user), 403);
         if ($user->isSuperAdmin()) {
             return back()->with('error', 'El SuperAdmin principal siempre debe permanecer activo.');
         }
 
         $user->update(['activo' => ! $user->activo]);
 
-        return back()->with('success', "Estado del usuario {$user->name} actualizado a " . ($user->activo ? 'ACTIVO' : 'INACTIVO'));
+        return back()->with('success', "Estado del usuario {$user->name} actualizado a ".($user->activo ? 'ACTIVO' : 'INACTIVO'));
+    }
+
+    private function autorizarAsignacion(Request $request, ?Rol $rol, ?User $destino = null): void
+    {
+        if ($request->user()->isSuperAdmin()) {
+            return;
+        }
+
+        abort_if($request->has('is_superadmin') && $request->boolean('is_superadmin'), 403);
+        abort_if($request->has('modulos') || $request->has('modulos_personalizados'), 403);
+        abort_if($rol && ($rol->es_sistema || $rol->modulos()->whereIn('codigo', ['usuarios', 'configuracion', 'auditoria'])->exists()), 403);
+        abort_if($destino && $rol && $destino->rol_id !== $rol->id, 403);
+        abort_if($destino && $destino->rolPersonalizado && ($destino->rolPersonalizado->es_sistema || $destino->rolPersonalizado->modulos()->whereIn('codigo', ['usuarios', 'configuracion', 'auditoria'])->exists()), 403);
     }
 }

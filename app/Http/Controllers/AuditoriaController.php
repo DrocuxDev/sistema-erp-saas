@@ -12,24 +12,25 @@ class AuditoriaController extends Controller
     {
         $query = Auditoria::query()->with('usuario');
 
-        // Filtro por tabla
         if ($request->filled('tabla')) {
-            $query->where('tabla', 'like', '%' . $request->tabla . '%');
+            $query->where('tabla', 'like', '%'.$request->tabla.'%');
         }
 
-        // Filtro por acción
-        if ($request->filled('accion')) {
+        if ($request->filled('accion') && in_array($request->accion, ['creacion', 'edicion', 'anulacion'], true)) {
             $query->where('accion', $request->accion);
         }
 
-        // Filtro por usuario
         if ($request->filled('usuario')) {
-            $query->whereHas('usuario', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->usuario . '%');
+            $query->whereHas('usuario', function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->usuario.'%');
             });
         }
 
-        $registros = $query->latest('created_at')->paginate(20)->withQueryString();
+        if ($request->filled('fecha')) {
+            $query->whereDate('created_at', $request->fecha);
+        }
+
+        $registros = $query->latest('id')->paginate(20)->withQueryString();
 
         return view('auditoria.index', compact('registros'));
     }

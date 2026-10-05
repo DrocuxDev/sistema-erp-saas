@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cliente;
 use App\Models\Cotizacion;
 use App\Models\OrdenCompra;
 use App\Models\OrdenCompraCliente;
@@ -67,7 +66,7 @@ class DashboardController extends Controller
                 $q->whereMonth('fecha', $mes);
             }
         })->selectRaw('SUM((precio_venta_unit - precio_compra_unit) * cantidad) as ganancia_total')
-          ->value('ganancia_total') ?? 0);
+            ->value('ganancia_total') ?? 0);
 
         $margenPct = $subtotalVentas > 0 ? round(($gananciaVentas / $subtotalVentas) * 100, 1) : 0;
 
@@ -86,8 +85,8 @@ class DashboardController extends Controller
         $cotizacionesFacturadas = (int) (clone $cotizacionesQuery)->where('estado', 'facturada')->count();
         $cotizacionesRechazadas = (int) (clone $cotizacionesQuery)->where('estado', 'rechazada')->count();
 
-        $tasaConversion = $totalCotizaciones > 0 
-            ? round((($cotizacionesAprobadas + $cotizacionesFacturadas) / $totalCotizaciones) * 100, 1) 
+        $tasaConversion = $totalCotizaciones > 0
+            ? round((($cotizacionesAprobadas + $cotizacionesFacturadas) / $totalCotizaciones) * 100, 1)
             : 0;
 
         // Órdenes de compra de clientes pendientes
@@ -96,8 +95,8 @@ class DashboardController extends Controller
 
         // 3. Gráfico 1: Ventas Mensuales (Ene - Dic)
         $ventasMensualesData = array_fill(1, 12, 0.0);
-        $monthSql = $isMySql 
-            ? 'MONTH(fecha) as mes_num, SUM(total) as monto_mes' 
+        $monthSql = $isMySql
+            ? 'MONTH(fecha) as mes_num, SUM(total) as monto_mes'
             : 'CAST(strftime("%m", fecha) AS INTEGER) as mes_num, SUM(total) as monto_mes';
 
         $ventasPorMes = Venta::whereYear('fecha', $anio)
@@ -129,7 +128,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'nombre' => $item->producto->nombre ?? 'Producto #' . $item->producto_id,
+                    'nombre' => $item->producto->nombre ?? 'Producto #'.$item->producto_id,
                     'sku' => $item->producto->sku ?? '—',
                     'monto' => round((float) $item->total_monto, 2),
                     'cantidad' => (float) $item->total_cantidad,
@@ -150,8 +149,8 @@ class DashboardController extends Controller
         $diasEnMes = Carbon::createFromDate($anio, $mesParaDiario, 1)->daysInMonth;
         $ventasDiariasData = array_fill(1, $diasEnMes, 0.0);
 
-        $daySql = $isMySql 
-            ? 'DAY(fecha) as dia_num, SUM(total) as monto_dia' 
+        $daySql = $isMySql
+            ? 'DAY(fecha) as dia_num, SUM(total) as monto_dia'
             : 'CAST(strftime("%d", fecha) AS INTEGER) as dia_num, SUM(total) as monto_dia';
 
         $ventasPorDia = Venta::whereYear('fecha', $anio)
@@ -202,7 +201,7 @@ class DashboardController extends Controller
         $mesesNombres = [
             1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
             5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
         ];
 
         return view('dashboard', compact(

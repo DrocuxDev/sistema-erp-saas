@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\CheckBusinessAction;
+use App\Http\Middleware\CheckModuloPermiso;
+use App\Http\Middleware\CheckRol;
+use App\Http\Middleware\CheckSuperadmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,8 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'rol' => \App\Http\Middleware\CheckRol::class,
-            'modulo' => \App\Http\Middleware\CheckModuloPermiso::class,
+            'rol' => CheckRol::class,
+            'modulo' => CheckModuloPermiso::class,
+            'superadmin' => CheckSuperadmin::class,
+            'accion' => CheckBusinessAction::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

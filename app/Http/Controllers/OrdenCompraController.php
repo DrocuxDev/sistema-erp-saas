@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Configuracion;
 use App\Models\OrdenCompra;
-use App\Models\OrdenCompraDetalle;
 use App\Models\Producto;
 use App\Models\Proveedor;
 use App\Models\SerieDocumento;
+use App\Services\DocumentoFiscalCalculator;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,66 +54,71 @@ class OrdenCompraController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'proveedor_id'   => 'required|exists:proveedores,id',
-            'fecha'          => 'required|date',
-            'forma_pago'     => 'nullable|string|max:150',
-            'plazo_entrega'  => 'nullable|string|max:150',
-            'lugar_entrega'  => 'nullable|string|max:255',
-            'observaciones'  => 'nullable|string|max:255',
-            'lineas'         => 'required|array|min:1',
-            'lineas.*.producto_id'        => 'required|exists:productos,id',
-            'lineas.*.cantidad'           => 'required|numeric|min:0.01',
-            'lineas.*.precio_compra'      => 'nullable|numeric|min:0',
-            'lineas.*.precio_compra_unit' => 'nullable|numeric|min:0',
+            'proveedor_id' => 'required|exists:proveedores,id',
+            'fecha' => 'required|date',
+            'forma_pago' => 'nullable|string|max:150',
+            'plazo_entrega' => 'nullable|string|max:150',
+            'lugar_entrega' => 'nullable|string|max:255',
+            'observaciones' => 'nullable|string|max:255',
+            'lineas' => 'required|array|min:1',
+            'lineas.*.producto_id' => 'required|exists:productos,id',
+            'lineas.*.cantidad' => 'required|numeric|min:0.01|max:1000000|decimal:0,2',
+            'lineas.*.precio_compra' => 'nullable|numeric|min:0|max:1000000|decimal:0,2',
+            'lineas.*.precio_compra_unit' => 'nullable|numeric|min:0|max:1000000|decimal:0,2',
         ]);
 
         foreach ($data['lineas'] as $l) {
             $prod = Producto::findOrFail($l['producto_id']);
-            if (!$prod->puede_comprarse) {
+            if (! $prod->puede_comprarse) {
                 throw ValidationException::withMessages([
                     'lineas' => "El producto \"{$prod->nombre}\" no está habilitado para compras.",
                 ]);
             }
         }
 
-        $subtotal = 0;
-        foreach ($data['lineas'] as $l) {
-            $precio = $l['precio_compra_unit'] ?? $l['precio_compra'] ?? 0;
-            $subtotal += round($l['cantidad'] * $precio, 2);
-        }
-        $subtotal = round($subtotal, 2);
-        $igv = round($subtotal * 0.18, 2);
-        $total = round($subtotal + $igv, 2);
+        $lineasFiscales = collect($data['lineas'])->map(fn ($linea) => [
+            'cantidad' => $linea['cantidad'],
+            'precio_compra_unit' => $linea['precio_compra_unit'] ?? $linea['precio_compra'] ?? 0,
+        ])->all();
+        $configuracion = Configuracion::where('activo', true)->first();
+        $importes = DocumentoFiscalCalculator::calcular($lineasFiscales, [
+            'precio_incluye_igv' => false,
+            'pct_igv' => $configuracion?->pct_igv ?? 18,
+            'pct_retencion' => 0,
+        ], 'precio_compra_unit');
+        $subtotal = $importes['subtotal'];
+        $igv = $importes['igv'];
+        $total = $importes['total'];
 
         $ordenCompra = DB::transaction(function () use ($data, $subtotal, $igv, $total) {
             $correlativoData = SerieDocumento::siguienteCodigo('orden_compra');
 
             $orden = OrdenCompra::create([
-                'proveedor_id'   => $data['proveedor_id'],
-                'usuario_id'     => auth()->id(),
-                'serie'          => $correlativoData['serie'],
-                'correlativo'    => $correlativoData['correlativo'],
-                'codigo'         => $correlativoData['codigo'],
-                'fecha'          => $data['fecha'],
-                'subtotal'       => $subtotal,
-                'igv'            => $igv,
-                'total'          => $total,
-                'estado'         => 'pendiente',
-                'observaciones'  => $data['observaciones'] ?? null,
-                'forma_pago'     => $data['forma_pago'] ?? '30 días crédito / Factura',
-                'plazo_entrega'  => $data['plazo_entrega'] ?? '3 a 5 días hábiles',
-                'lugar_entrega'  => $data['lugar_entrega'] ?? 'Almacén Central JHARDSYSTEX',
+                'proveedor_id' => $data['proveedor_id'],
+                'usuario_id' => auth()->id(),
+                'serie' => $correlativoData['serie'],
+                'correlativo' => $correlativoData['correlativo'],
+                'codigo' => $correlativoData['codigo'],
+                'fecha' => $data['fecha'],
+                'subtotal' => $subtotal,
+                'igv' => $igv,
+                'total' => $total,
+                'estado' => 'pendiente',
+                'observaciones' => $data['observaciones'] ?? null,
+                'forma_pago' => $data['forma_pago'] ?? '30 días crédito / Factura',
+                'plazo_entrega' => $data['plazo_entrega'] ?? '3 a 5 días hábiles',
+                'lugar_entrega' => $data['lugar_entrega'] ?? 'Almacén Central JHARDSYSTEX',
             ]);
 
             foreach ($data['lineas'] as $l) {
                 $precio = $l['precio_compra_unit'] ?? $l['precio_compra'] ?? 0;
                 DB::table('orden_compra_detalle')->insert([
-                    'orden_compra_id'       => $orden->id,
-                    'producto_id'           => $l['producto_id'],
-                    'presentacion_compra_id'=> null,
+                    'orden_compra_id' => $orden->id,
+                    'producto_id' => $l['producto_id'],
+                    'presentacion_compra_id' => null,
                     'cantidad_presentacion' => null,
-                    'cantidad'              => $l['cantidad'],
-                    'precio_compra_unit'    => $precio,
+                    'cantidad' => $l['cantidad'],
+                    'precio_compra_unit' => $precio,
                 ]);
             }
 
@@ -136,7 +141,11 @@ class OrdenCompraController extends Controller
 
         $configuracion = Configuracion::where('activo', true)->first();
 
-        return view('ordenes-compra.show', compact('orden_compra', 'detalles', 'configuracion'));
+        $cantidadRecibida = DB::table('compra_detalle')->join('compras', 'compras.id', '=', 'compra_detalle.compra_id')
+            ->where('compras.orden_compra_id', $orden_compra->id)->sum('compra_detalle.cantidad');
+        $cantidadOrdenada = $detalles->sum('cantidad');
+
+        return view('ordenes-compra.show', compact('orden_compra', 'detalles', 'configuracion', 'cantidadRecibida', 'cantidadOrdenada'));
     }
 
     public function aprobar(OrdenCompra $orden_compra)
@@ -152,11 +161,18 @@ class OrdenCompraController extends Controller
 
     public function anular(OrdenCompra $orden_compra)
     {
-        if ($orden_compra->estado === 'recibida') {
-            return back()->with('error', 'No se puede anular una orden que ya ha sido recibida en almacén.');
-        }
+        $anulada = DB::transaction(function () use ($orden_compra) {
+            $orden = OrdenCompra::whereKey($orden_compra->id)->lockForUpdate()->firstOrFail();
+            if (! in_array($orden->estado, ['pendiente', 'aprobada'], true) || $orden->compras()->exists()) {
+                return false;
+            }
+            $orden->update(['estado' => 'anulada']);
 
-        $orden_compra->update(['estado' => 'anulada']);
+            return true;
+        });
+        if (! $anulada) {
+            return back()->with('error', 'No se puede anular una orden con recepciones, incluso si son parciales.');
+        }
 
         return back()->with('success', "Orden de Compra {$orden_compra->codigo_formateado} anulada correctamente.");
     }

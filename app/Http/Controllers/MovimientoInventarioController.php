@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\MovimientoInventario;
 use App\Models\Producto;
+use App\Services\InventarioService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class MovimientoInventarioController extends Controller
@@ -49,26 +51,21 @@ class MovimientoInventarioController extends Controller
         $validated = $request->validate([
             'producto_id' => ['required', 'exists:productos,id'],
             'tipo' => ['required', 'in:entrada,salida,ajuste'],
-            'cantidad' => ['required', 'numeric', 'gt:0'],
+            'cantidad' => ['required', 'numeric', 'gt:0', 'max:1000000', 'decimal:0,2'],
         ]);
 
         try {
-            MovimientoInventario::create([
-                'producto_id' => $validated['producto_id'],
-                'tipo' => $validated['tipo'],
-                'cantidad' => $validated['cantidad'],
-                'referencia_tipo' => 'ajuste',
-                'referencia_id' => null,
-                'usuario_id' => auth()->id(),
-                'fecha' => now()->toDateString(),
-            ]);
+            DB::transaction(fn () => app(InventarioService::class)->registrar(
+                (int) $validated['producto_id'], $validated['tipo'], (string) $validated['cantidad'],
+                'ajuste', null, now()->toDateString()
+            ));
 
             return redirect()->route('inventario.kardex')
                 ->with('success', 'Ajuste de inventario registrado exitosamente.');
         } catch (Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', 'Error al realizar ajuste: ' . ($e->getMessage() ?: 'Stock insuficiente o validación fallida.'));
+                ->with('error', 'Error al realizar ajuste: '.($e->getMessage() ?: 'Existencias insuficientes o validación fallida.'));
         }
     }
 }
