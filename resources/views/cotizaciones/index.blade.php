@@ -3,15 +3,12 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </span>
                     Cotizaciones Comerciales
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Control de propuestas técnicas, códigos de cotización (Serie C001) y versiones</p>
             </div>
             <a href="{{ route('cotizaciones.create') }}"
-               class="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl shadow-md shadow-cyan-900/20 transition-all font-semibold text-sm">
+               class="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl shadow-2xs transition-all font-semibold text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Nueva Cotización
             </a>
@@ -19,7 +16,7 @@
     </x-slot>
 
     <div class="py-6 sm:py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="page-container space-y-6">
 
             @if(session('success'))
                 <div class="p-4 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 rounded-2xl text-sm font-semibold">
@@ -70,7 +67,7 @@
                     </select>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="submit" class="px-4 py-2 bg-purple-primary hover:bg-purple-light text-white rounded-xl text-xs font-bold transition-colors shadow-sm">
+                    <button type="submit" class="px-4 py-2 bg-cyan-600 dark:bg-cyan-500 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white rounded-xl text-xs font-semibold transition-colors shadow-2xs">
                         Filtrar
                     </button>
                     <a href="{{ route('cotizaciones.index') }}" class="px-3 py-2 bg-gray-200 dark:bg-darker-bg text-gray-700 dark:text-gray-300 rounded-xl text-xs hover:bg-gray-300 transition-colors">
@@ -83,7 +80,7 @@
             <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs text-left">
-                        <thead class="bg-slate-900 text-white uppercase text-[10px] tracking-wider font-semibold">
+                        <thead class="bg-slate-900 text-slate-200 text-xs font-medium border-b border-slate-800">
                             <tr>
                                 <th class="px-4 py-3.5 w-[14%]">Código / Versión</th>
                                 <th class="px-3 py-3.5 w-[10%]">Tipo</th>
@@ -123,7 +120,7 @@
                                             {{ $cotizacion->asunto ?: '—' }}
                                         </div>
                                         @if($cotizacion->ordenCompraCliente)
-                                            <div class="text-[10px] text-purple-primary font-mono mt-0.5">
+                                            <div class="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono mt-0.5">
                                                 OC: {{ $cotizacion->ordenCompraCliente->numero_oc }}
                                             </div>
                                         @endif
@@ -156,23 +153,11 @@
 
                                     {{-- Acciones --}}
                                     <td class="px-4 py-3.5 text-right">
-                                        <div class="flex justify-end gap-1.5">
-                                            <a href="{{ route('cotizaciones.show', $cotizacion) }}"
-                                               class="px-2.5 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-semibold hover:bg-purple-200 transition-colors"
-                                               title="Ver detalle de cotización">
-                                                Ver
-                                            </a>
-                                            <a href="{{ route('cotizaciones.pdf', $cotizacion) }}" target="_blank"
-                                               class="px-2.5 py-1 bg-slate-100 dark:bg-darker-bg text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-200 transition-colors"
-                                               title="Imprimir / PDF">
-                                                PDF
-                                            </a>
+                                        <div class="flex justify-end gap-2">
+                                            <x-action-button icon="view" color="cyan" label="Ver detalle de cotización" :href="route('cotizaciones.show', $cotizacion)" />
+                                            <x-action-button icon="pdf" color="slate" label="Imprimir / PDF" :href="route('cotizaciones.pdf', $cotizacion)" target="_blank" />
                                             @if($cotizacion->estado === 'pendiente')
-                                                <a href="{{ route('cotizaciones.edit', $cotizacion) }}"
-                                                   class="px-2.5 py-1 bg-gray-100 dark:bg-darker-bg text-gray-700 dark:text-gray-300 rounded-lg text-xs hover:bg-gray-200 transition-colors"
-                                                   title="Editar cotización">
-                                                    Editar
-                                                </a>
+                                                <x-action-button icon="edit" color="amber" label="Editar cotización" :href="route('cotizaciones.edit', $cotizacion)" />
                                             @endif
                                         </div>
                                     </td>

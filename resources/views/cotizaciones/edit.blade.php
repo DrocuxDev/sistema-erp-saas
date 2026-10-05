@@ -3,11 +3,14 @@
         return [
             'id' => $producto->id,
             'nombre' => $producto->nombre,
+            'sku' => $producto->sku,
             'unidad_medida' => $producto->unidad_medida,
+            'precio_venta' => $producto->precio_venta !== null ? (float) $producto->precio_venta : null,
+            'precio_compra' => $producto->precio_compra !== null ? (float) $producto->precio_compra : null,
             'proveedores' => $producto->productoProveedores->map(function ($pp) {
                 return [
                     'id' => $pp->proveedor_id,
-                    'nombre' => $pp->proveedor->nombre,
+                    'nombre' => $pp->proveedor->nombre ?? null,
                     'precio_compra' => (float) $pp->precio_compra,
                 ];
             })->values(),
@@ -30,6 +33,7 @@
     $lineasIniciales = old('lineas', $cotizacion->detalles->map(function ($detalle) {
         return [
             'producto_id' => $detalle->producto_id,
+            'producto_nombre' => $detalle->producto->nombre ?? '',
             'proveedor_id' => $detalle->proveedor_id,
             'descripcion' => $detalle->descripcion,
             'unidad_medida' => $detalle->unidad_medida ?: 'UND',
@@ -48,7 +52,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-3">
                 <a href="{{ route('cotizaciones.show', $cotizacion) }}" class="p-2 bg-gray-100 dark:bg-darker-bg text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition-colors">
-                    ← Volver
+                    Volver
                 </a>
                 <div>
                     <div class="flex items-center gap-2">
@@ -67,16 +71,16 @@
             </div>
             <div class="flex items-center gap-2">
                 <button type="submit" form="form-cotizacion"
-                        class="px-5 py-2.5 bg-purple-primary hover:bg-purple-light text-white rounded-xl text-sm font-semibold shadow-md shadow-purple-900/20 transition-all flex items-center gap-2">
+                        class="btn-primary">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    Actualizar Cotización
+                    <span>Actualizar Cotización</span>
                 </button>
             </div>
         </div>
     </x-slot>
 
     <div class="py-6 sm:py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="page-container space-y-6">
 
             @if($errors->any())
                 <div class="p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 rounded-xl text-sm">
@@ -89,16 +93,19 @@
                 </div>
             @endif
 
-            <form action="{{ route('cotizaciones.update', $cotizacion) }}" method="POST" id="form-cotizacion" class="space-y-6">
+            <form action="{{ route('cotizaciones.update', $cotizacion) }}" method="POST" id="form-cotizacion" class="space-y-6" data-dirty-check>
                 @csrf
                 @method('PUT')
+                @if($cotizacion->orden_compra_cliente_id)
+                    <input type="hidden" name="orden_compra_cliente_id" value="{{ $cotizacion->orden_compra_cliente_id }}">
+                @endif
 
                 {{-- 1. SECCIÓN: TIPO DE COTIZACIÓN Y DATOS PRINCIPALES --}}
                 <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-5 sm:p-6">
                     <div class="border-b border-gray-100 dark:border-gray-700/60 pb-4 mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-purple-primary"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-600 dark:bg-cyan-500"></span>
                                 Datos del Comprobante y Cliente
                             </h3>
                             <p class="text-xs text-gray-500">Configuración de portada corporativa e información del proyecto</p>
@@ -120,9 +127,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         {{-- Cliente --}}
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Cliente / Razón Social *</label>
+                            <label class="form-label">Cliente / Razón Social *</label>
                             <select name="cliente_id" id="select-cliente" required
-                                    class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-purple-primary">
+                                    class="form-input">
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->id }}" {{ (string) old('cliente_id', $cotizacion->cliente_id) === (string) $cliente->id ? 'selected' : '' }}>
                                         {{ $cliente->nombre }} (RUC: {{ $cliente->ruc ?? 'S/N' }})
@@ -133,33 +140,33 @@
 
                         {{-- Representante / Contacto --}}
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Representante / Atención</label>
+                            <label class="form-label">Representante / Atención</label>
                             <input type="text" name="representante" id="input-representante"
                                    value="{{ old('representante', $cotizacion->representante ?: ($cotizacion->cliente->contacto ?? '')) }}"
                                    placeholder="Ej: Ing. Juan Pérez"
-                                   class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-purple-primary">
+                                   class="form-input">
                         </div>
 
                         {{-- Fecha --}}
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Fecha de Emisión *</label>
+                            <label class="form-label">Fecha de Emisión *</label>
                             <input type="date" name="fecha" value="{{ old('fecha', $cotizacion->fecha ? $cotizacion->fecha->format('Y-m-d') : date('Y-m-d')) }}" required
-                                   class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-purple-primary">
+                                   class="form-input">
                         </div>
 
                         {{-- Asunto / Proyecto --}}
                         <div class="md:col-span-3">
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Asunto / Nombre del Proyecto</label>
+                            <label class="form-label">Asunto / Nombre del Proyecto</label>
                             <input type="text" name="asunto" value="{{ old('asunto', $cotizacion->asunto ?: 'COTIZACIÓN PROYECTO TI') }}"
                                    placeholder="Ej: COTIZACION PROYECTO O_US / MANTENIMIENTO PREVENTIVO DE RACKS"
-                                   class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-purple-primary">
+                                   class="form-input">
                         </div>
 
                         {{-- No Utilizable --}}
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">No Utilizable (S/)</label>
+                            <label class="form-label">No Utilizable (S/)</label>
                             <input type="number" name="no_utilizable" id="input-no-utilizable" value="{{ old('no_utilizable', $cotizacion->resumen->no_utilizable ?? 0) }}" min="0" step="0.01"
-                                   class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm focus:ring-2 focus:ring-purple-primary">
+                                   class="form-input">
                         </div>
                     </div>
                 </div>
@@ -177,29 +184,31 @@
                     </button>
                     <div id="tasas-panel" class="hidden px-5 pb-5 pt-2 border-t border-gray-100 dark:border-gray-700/60">
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div><label class="form-label">Precio unitario</label><select name="precio_incluye_igv" class="form-input"><option value="0" @selected((string) old('precio_incluye_igv', (int) $precioIncluyeIgvDefault) === '0')>Sin IGV</option><option value="1" @selected((string) old('precio_incluye_igv', (int) $precioIncluyeIgvDefault) === '1')>Incluye IGV</option></select></div>
+                            <div class="md:col-span-3"><label class="form-label">Motivo de excepción tributaria</label><input name="motivo_excepcion_tributaria" class="form-input" value="{{ old('motivo_excepcion_tributaria', $cotizacion->motivo_excepcion_tributaria) }}" placeholder="Obligatorio si cambias base, IGV o retención del cliente"></div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">IGV (%)</label>
+                                <label class="form-label">IGV (%)</label>
                                 <input type="number" step="0.01" min="0" max="100" name="pct_igv"
                                        value="{{ old('pct_igv', $tasasDefault['pct_igv']) }}"
-                                       class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm font-mono font-bold focus:ring-2 focus:ring-cyan-500">
+                                       class="form-input font-mono font-bold focus:ring-2 focus:ring-cyan-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Retención (%)</label>
+                                <label class="form-label">Retención (%)</label>
                                 <input type="number" step="0.01" min="0" max="100" name="pct_retencion"
                                        value="{{ old('pct_retencion', $tasasDefault['pct_retencion']) }}"
-                                       class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-cyan-500">
+                                       class="form-input font-mono focus:ring-2 focus:ring-cyan-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Comisión Venta (%)</label>
+                                <label class="form-label">Comisión Venta (%)</label>
                                 <input type="number" step="0.01" min="0" max="100" name="pct_comision_venta"
                                        value="{{ old('pct_comision_venta', $tasasDefault['pct_comision_venta']) }}"
-                                       class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-cyan-500">
+                                       class="form-input font-mono focus:ring-2 focus:ring-cyan-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Comisión Ganancia (%)</label>
+                                <label class="form-label">Comisión Ganancia (%)</label>
                                 <input type="number" step="0.01" min="0" max="100" name="pct_comision_ganancia"
                                        value="{{ old('pct_comision_ganancia', $tasasDefault['pct_comision_ganancia']) }}"
-                                       class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-cyan-500">
+                                       class="form-input font-mono focus:ring-2 focus:ring-cyan-500">
                             </div>
                         </div>
                         <p class="text-[10px] text-gray-400 mt-2">Estos son los porcentajes almacenados con esta cotización. Modificarlos solo afecta a este documento.</p>
@@ -225,7 +234,7 @@
 
                     <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
                         <table class="w-full text-xs text-left" id="tabla-lineas">
-                            <thead class="bg-slate-900 text-white uppercase text-[10px] tracking-wider font-semibold">
+                            <thead class="bg-slate-900 text-white text-xs font-semibold">
                                 <tr>
                                     <th class="px-3 py-3 w-[26%]">Descripción / Producto</th>
                                     <th class="px-2 py-3 w-[7%] text-center">Und</th>
@@ -242,6 +251,8 @@
                             <tbody id="lineas-body" class="divide-y divide-gray-200 dark:divide-gray-700/60 font-sans"></tbody>
                         </table>
                     </div>
+                    <p id="aviso-lineas" class="hidden mt-2 text-xs font-semibold text-red-600 dark:text-red-400">Revisa las filas: cada una debe tener un producto elegido de la lista (no basta con escribir el texto).</p>
+                    <p id="aviso-duplicados" class="hidden mt-1 text-xs font-semibold text-amber-600 dark:text-amber-400">Hay un producto repetido en dos filas. Deja solo una o cambia la selección.</p>
                 </div>
 
                 {{-- 3. SECCIÓN: RESUMEN MONETARIO Y TÉRMINOS COMERCIALES --}}
@@ -250,7 +261,7 @@
                     {{-- Términos y Condiciones --}}
                     <div class="lg:col-span-2 bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-5 space-y-4">
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-gray-100 dark:border-gray-700/60 pb-3">
-                            <svg class="w-4 h-4 text-purple-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             Términos y Condiciones Comerciales (Impresos en PDF)
                         </h3>
 
@@ -282,12 +293,18 @@
                             <textarea name="observaciones" rows="2" placeholder="Notas internas o especificaciones especiales..."
                                       class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-3 py-2 text-xs resize-none">{{ old('observaciones', $cotizacion->observaciones) }}</textarea>
                         </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Condiciones adicionales (impresas en el PDF)</label>
+                            <textarea name="condiciones_adicionales" rows="2" placeholder="Ej: Stock sujeto a disponibilidad. Garantía de 12 meses..."
+                                      class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-3 py-2 text-xs resize-none">{{ old('condiciones_adicionales', $cotizacion->condiciones_adicionales) }}</textarea>
+                        </div>
                     </div>
 
                     {{-- Tarjeta de Totales Financieros en Vivo --}}
                     <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-5 shadow-lg flex flex-col justify-between">
                         <div>
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700 pb-2 mb-3">
+                            <h3 class="text-xs font-semibold text-slate-400 border-b border-slate-700 pb-2 mb-3">
                                 Resumen Financiero en Tiempo Real
                             </h3>
                             <div class="space-y-2.5 text-xs font-mono">
@@ -327,7 +344,7 @@
                                 Cancelar
                             </a>
                             <button type="submit"
-                                    class="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-xs font-bold transition-all shadow-md">
+                                    class="btn-primary !min-h-[36px] !py-1.5 !px-5 text-xs">
                                 Guardar Cambios
                             </button>
                         </div>
@@ -339,14 +356,53 @@
     </div>
 
     @push('scripts')
+    <script src="{{ asset('js/cotizacion-producto-combobox.js') }}"></script>
     <script>
         const productos = @json($productosJson);
+        window.productos = productos;
         const clientes = @json($clientesJson);
         const lineasIniciales = @json($lineasIniciales);
+        const PRODUCTOS_SEARCH_URL = @json(route('productos.buscar'));
+        const PRODUCTOS_RAPIDO_URL = @json(route('productos.rapido'));
+        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('#form-cotizacion input[name="_token"]')?.value || '';
         let lineaIndex = 0;
+        const comboApis = [];
 
         function obtenerProducto(id) {
             return productos.find(p => String(p.id) === String(id));
+        }
+
+        function nombreProducto(id) {
+            const p = obtenerProducto(id);
+            return p ? (p.nombre || '') : '';
+        }
+
+        function validarDuplicados() {
+            const ids = [...document.querySelectorAll('#lineas-body tr')].map(tr => tr.querySelector('.linea-producto-id')?.value || '');
+            const conteo = {};
+            ids.forEach(id => { if (id) conteo[id] = (conteo[id] || 0) + 1; });
+            let hayDuplicados = false;
+            document.querySelectorAll('#lineas-body tr').forEach(tr => {
+                const id = tr.querySelector('.linea-producto-id')?.value || '';
+                const errEl = tr.querySelector('.linea-producto-error');
+                const input = tr.querySelector('.combo-prod-input');
+                const esDuplicado = id && conteo[id] > 1;
+                if (esDuplicado) {
+                    hayDuplicados = true;
+                    if (errEl && errEl.textContent !== 'Selecciona un producto de la lista') {
+                        errEl.textContent = 'Producto duplicado en otra fila';
+                        errEl.classList.remove('hidden');
+                    }
+                    input?.classList.add('!border-red-500');
+                } else if (errEl && errEl.textContent === 'Producto duplicado en otra fila') {
+                    errEl.textContent = '';
+                    errEl.classList.add('hidden');
+                    input?.classList.remove('!border-red-500');
+                }
+            });
+            const aviso = document.getElementById('aviso-duplicados');
+            if (aviso) aviso.classList.toggle('hidden', !hayDuplicados);
+            return !hayDuplicados;
         }
 
         function crearFilaLinea(data = {}) {
@@ -355,17 +411,18 @@
             tr.className = 'hover:bg-slate-50 dark:hover:bg-darker-bg/50 transition-colors';
             tr.dataset.index = idx;
 
-            const productoOptions = productos.map(p =>
-                `<option value="${p.id}" ${String(data.producto_id) === String(p.id) ? 'selected' : ''}>${p.nombre}</option>`
-            ).join('');
+            const nombreInicial = data.producto_nombre || nombreProducto(data.producto_id);
 
             tr.innerHTML = `
                 <td class="px-2 py-2">
-                    <select name="lineas[${idx}][producto_id]" required class="linea-producto w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-2 py-1 text-xs">
-                        <option value="">Seleccionar producto...</option>
-                        ${productoOptions}
-                    </select>
-                    <input type="text" name="lineas[${idx}][descripcion]" value="${data.descripcion ?? ''}" placeholder="Detalle adicional opcional..."
+                    <div class="relative">
+                        <input type="text" autocomplete="off" placeholder="Escribe para buscar producto..."
+                               value="${String(nombreInicial ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')}"
+                               class="combo-prod-input linea-producto-text w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-2 py-1 text-xs">
+                        <input type="hidden" name="lineas[${idx}][producto_id]" value="${data.producto_id ?? ''}" class="linea-producto-id">
+                        <p class="linea-producto-error hidden mt-1 text-[11px] font-semibold text-red-600 dark:text-red-400"></p>
+                    </div>
+                    <input type="text" name="lineas[${idx}][descripcion]" value="${String(data.descripcion ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')}" placeholder="Detalle adicional opcional..."
                            class="linea-descripcion mt-1 w-full rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-darker-bg px-1.5 py-0.5 text-[11px] text-gray-600 dark:text-gray-400">
                 </td>
                 <td class="px-1 py-2 text-center">
@@ -408,7 +465,9 @@
 
             document.getElementById('lineas-body').appendChild(tr);
 
-            const selectProd = tr.querySelector('.linea-producto');
+            const inputProdText = tr.querySelector('.linea-producto-text');
+            const hiddenProdId = tr.querySelector('.linea-producto-id');
+            const errorProd = tr.querySelector('.linea-producto-error');
             const selectProv = tr.querySelector('.linea-proveedor');
             const inputUnidad = tr.querySelector('.linea-unidad');
             const inputCant = tr.querySelector('.linea-cant');
@@ -418,21 +477,30 @@
             const spanPvTotal = tr.querySelector('.linea-pv-total');
             const spanGanancia = tr.querySelector('.linea-ganancia');
 
-            function actualizarProveedores(productoId, proveedorSeleccionado = null) {
-                const producto = obtenerProducto(productoId);
+            function pintarProveedores(producto, proveedorSeleccionado = null) {
                 selectProv.innerHTML = '<option value="">Proveedor...</option>';
                 if (!producto) return;
+                (producto.proveedores || []).forEach(prov => {
+                    const selected = String(proveedorSeleccionado) === String(prov.id) ? 'selected' : '';
+                    const nombre = (prov.nombre || 'Proveedor').replace(/</g, '&lt;');
+                    selectProv.innerHTML += `<option value="${prov.id}" ${selected}>${nombre}</option>`;
+                });
+            }
+
+            function actualizarProveedores(productoId, proveedorSeleccionado = null) {
+                const producto = obtenerProducto(productoId);
+                if (!producto) {
+                    pintarProveedores(null);
+                    recalcularTotales();
+                    return;
+                }
+                pintarProveedores(producto, proveedorSeleccionado);
 
                 if (producto.unidad_medida && !inputUnidad.value) {
                     inputUnidad.value = producto.unidad_medida;
                 }
 
-                producto.proveedores.forEach(prov => {
-                    const selected = String(proveedorSeleccionado) === String(prov.id) ? 'selected' : '';
-                    selectProv.innerHTML += `<option value="${prov.id}" ${selected}>${prov.nombre}</option>`;
-                });
-
-                if (producto.proveedores.length === 1 && !proveedorSeleccionado) {
+                if ((producto.proveedores || []).length === 1 && !proveedorSeleccionado) {
                     selectProv.value = producto.proveedores[0].id;
                     if (!inputPcUnit.value) {
                         inputPcUnit.value = producto.proveedores[0].precio_compra;
@@ -441,20 +509,38 @@
                 recalcularTotales();
             }
 
+            function aplicarProductoSeleccionado(producto) {
+                if (producto.unidad_medida) inputUnidad.value = producto.unidad_medida;
+                if (producto.precio_venta !== null && producto.precio_venta !== undefined && producto.precio_venta !== '') {
+                    inputPvUnit.value = producto.precio_venta;
+                }
+                pintarProveedores(producto, null);
+                if ((producto.proveedores || []).length === 1) {
+                    selectProv.value = producto.proveedores[0].id;
+                    inputPcUnit.value = producto.proveedores[0].precio_compra;
+                } else if ((producto.proveedores || []).length > 1) {
+                    selectProv.value = '';
+                    inputPcUnit.value = inputPcUnit.value || '';
+                } else if (producto.precio_compra !== null && producto.precio_compra !== undefined && producto.precio_compra !== '') {
+                    inputPcUnit.value = producto.precio_compra;
+                }
+                if (!obtenerProducto(producto.id)) {
+                    productos.push(producto);
+                }
+                recalcularFila();
+                validarDuplicados();
+            }
+
             function recalcularFila() {
-                const cant = parseFloat(inputCant.value) || 0;
-                const pvUnit = parseFloat(inputPvUnit.value) || 0;
-                const pcUnit = parseFloat(inputPcUnit.value) || 0;
-                const igvComp = parseFloat(inputIgvComp.value) || 0;
+                const ventaCentimos = window.importeLineaCentimos(inputCant.value, inputPvUnit.value);
+                const compraCentimos = window.importeLineaCentimos(inputCant.value, inputPcUnit.value)
+                    + window.aCentimos(inputIgvComp.value);
+                const gananciaCentimos = ventaCentimos - compraCentimos;
 
-                const pvTotal = cant * pvUnit;
-                const pcTotal = (cant * pcUnit) + igvComp;
-                const ganancia = pvTotal - pcTotal;
+                spanPvTotal.textContent = 'S/ ' + window.formatearCentimos(ventaCentimos);
+                spanGanancia.textContent = 'S/ ' + window.formatearCentimos(gananciaCentimos);
 
-                spanPvTotal.textContent = 'S/ ' + pvTotal.toFixed(2);
-                spanGanancia.textContent = 'S/ ' + ganancia.toFixed(2);
-
-                if (ganancia >= 0) {
+                if (gananciaCentimos >= 0n) {
                     spanGanancia.className = 'linea-ganancia text-emerald-600 dark:text-emerald-400 font-bold';
                 } else {
                     spanGanancia.className = 'linea-ganancia text-red-600 dark:text-red-400 font-bold';
@@ -463,10 +549,25 @@
                 recalcularTotales();
             }
 
-            selectProd.addEventListener('change', () => actualizarProveedores(selectProd.value));
+            const comboApi = window.CotizacionProductoCombobox.attach({
+                input: inputProdText,
+                hidden: hiddenProdId,
+                errorEl: errorProd,
+                productos,
+                proveedores: @json($proveedores),
+                searchUrl: PRODUCTOS_SEARCH_URL,
+                createUrl: PRODUCTOS_RAPIDO_URL,
+                csrfToken: CSRF_TOKEN,
+                initialId: data.producto_id || '',
+                initialNombre: nombreInicial,
+                onSelect: aplicarProductoSeleccionado,
+                onClear: () => { validarDuplicados(); },
+                onValidate: () => { validarDuplicados(); },
+            });
+            comboApis.push(comboApi);
             selectProv.addEventListener('change', () => {
-                const producto = obtenerProducto(selectProd.value);
-                const prov = producto?.proveedores.find(p => String(p.id) === String(selectProv.value));
+                const producto = obtenerProducto(hiddenProdId.value);
+                const prov = producto?.proveedores?.find(p => String(p.id) === String(selectProv.value));
                 if (prov && !inputPcUnit.value) {
                     inputPcUnit.value = prov.precio_compra;
                 }
@@ -479,8 +580,10 @@
 
             tr.querySelector('.btn-quitar-linea').addEventListener('click', () => {
                 if (document.querySelectorAll('#lineas-body tr').length > 1) {
+                    comboApis.splice(comboApis.indexOf(comboApi), 1);
                     tr.remove();
                     recalcularTotales();
+                    validarDuplicados();
                 }
             });
 
@@ -490,35 +593,80 @@
             recalcularFila();
         }
 
-        function recalcularTotales() {
-            let subtotal = 0;
-            let compraFija = 0;
-
-            document.querySelectorAll('#lineas-body tr').forEach(tr => {
-                const cant = parseFloat(tr.querySelector('.linea-cant')?.value) || 0;
-                const pv = parseFloat(tr.querySelector('.linea-pv-unit')?.value) || 0;
-                const pc = parseFloat(tr.querySelector('.linea-pc-unit')?.value) || 0;
-                const igvComp = parseFloat(tr.querySelector('.linea-igv-compra')?.value) || 0;
-
-                subtotal += (cant * pv);
-                compraFija += ((cant * pc) + igvComp);
+        function validarFormularioLineas() {
+            let ok = true;
+            comboApis.forEach(api => {
+                if (!api.validarFila()) ok = false;
             });
-
-            const igv = subtotal * 0.18;
-            const retencion = 0;
-            const totalFacturar = subtotal + igv - retencion;
-            const ganancia = subtotal - compraFija;
-
-            document.getElementById('live-subtotal').textContent = 'S/ ' + subtotal.toFixed(2);
-            document.getElementById('live-igv').textContent = 'S/ ' + igv.toFixed(2);
-            document.getElementById('live-retencion').textContent = 'S/ ' + retencion.toFixed(2);
-            document.getElementById('live-total').textContent = 'S/ ' + totalFacturar.toFixed(2);
-            document.getElementById('live-compra-fija').textContent = 'S/ ' + compraFija.toFixed(2);
-            document.getElementById('live-ganancia').textContent = 'S/ ' + ganancia.toFixed(2);
+            document.querySelectorAll('#lineas-body tr').forEach(tr => {
+                const hidden = tr.querySelector('.linea-producto-id');
+                const errEl = tr.querySelector('.linea-producto-error');
+                const input = tr.querySelector('.combo-prod-input');
+                if (!hidden?.value) {
+                    ok = false;
+                    if (errEl) {
+                        errEl.textContent = 'Selecciona un producto de la lista';
+                        errEl.classList.remove('hidden');
+                    }
+                    input?.classList.add('!border-red-500');
+                }
+            });
+            if (!validarDuplicados()) ok = false;
+            const aviso = document.getElementById('aviso-lineas');
+            if (aviso) aviso.classList.toggle('hidden', ok);
+            return ok;
         }
 
+        function recalcularTotales() {
+            const lineas = [...document.querySelectorAll('#lineas-body tr')].map(tr => ({
+                cantidad: tr.querySelector('.linea-cant')?.value || '0',
+                precio_venta_unit: tr.querySelector('.linea-pv-unit')?.value || '0',
+                precio_compra_unit: tr.querySelector('.linea-pc-unit')?.value || '0',
+                igv_compra: tr.querySelector('.linea-igv-compra')?.value || '0',
+            }));
+            const resumen = window.calcularResumenCotizacion({
+                lineas,
+                pctIgv: document.querySelector('[name="pct_igv"]').value || '0',
+                pctRetencion: document.querySelector('[name="pct_retencion"]').value || '0',
+                pctComisionVenta: document.querySelector('[name="pct_comision_venta"]').value || '0',
+                pctComisionGanancia: document.querySelector('[name="pct_comision_ganancia"]').value || '0',
+                precioIncluyeIgv: document.querySelector('[name="precio_incluye_igv"]').value === '1',
+                noUtilizable: document.querySelector('[name="no_utilizable"]').value || '0',
+            });
+
+            document.getElementById('live-subtotal').textContent = 'S/ ' + resumen.subtotal;
+            document.getElementById('live-igv').textContent = 'S/ ' + resumen.igv;
+            document.getElementById('live-retencion').textContent = 'S/ ' + resumen.retencion;
+            document.getElementById('live-total').textContent = 'S/ ' + resumen.totalFacturar;
+            document.getElementById('live-compra-fija').textContent = 'S/ ' + resumen.compraFija;
+            document.getElementById('live-ganancia').textContent = 'S/ ' + resumen.ganancia;
+        }
+
+        document.querySelectorAll('[name="no_utilizable"]').forEach(input => input.addEventListener('input', recalcularTotales));
+
         document.getElementById('btn-agregar-linea').addEventListener('click', () => crearFilaLinea());
-        lineasIniciales.forEach(linea => crearFilaLinea(linea));
+        const perfilesClientes = @json($clientes->mapWithKeys(fn ($cliente) => [$cliente->id => ['precio_incluye_igv' => (bool) $cliente->precio_incluye_igv, 'pct_igv' => (float) $cliente->pct_igv, 'pct_retencion' => (float) $cliente->pct_retencion]]));
+        document.getElementById('select-cliente').addEventListener('change', event => {
+            const perfil = perfilesClientes[event.target.value];
+            if (!perfil) return;
+            document.querySelector('[name="precio_incluye_igv"]').value = perfil.precio_incluye_igv ? '1' : '0';
+            document.querySelector('[name="pct_igv"]').value = perfil.pct_igv;
+            document.querySelector('[name="pct_retencion"]').value = perfil.pct_retencion;
+            const cliente = clientes.find(c => String(c.id) === String(event.target.value));
+            if (cliente?.condicion_pago) document.querySelector('[name="forma_pago"]').value = cliente.condicion_pago;
+            recalcularTotales();
+        });
+        ['pct_igv', 'pct_retencion', 'precio_incluye_igv'].forEach(name => document.querySelector(`[name="${name}"]`).addEventListener('input', recalcularTotales));
+        document.getElementById('form-cotizacion').addEventListener('submit', (e) => {
+            if (!validarFormularioLineas()) {
+                e.preventDefault();
+                document.getElementById('tabla-lineas')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+        window.addEventListener('load', () => {
+            lineasIniciales.forEach(linea => crearFilaLinea(linea));
+            recalcularTotales();
+        }, { once: true });
     </script>
     @endpush
 </x-app-layout>

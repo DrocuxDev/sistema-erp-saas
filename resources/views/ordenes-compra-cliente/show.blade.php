@@ -1,10 +1,10 @@
 <x-app-layout>
-    <div class="p-4 sm:p-6 space-y-6 max-w-5xl mx-auto">
+    <div class="page-container py-4 sm:py-6 space-y-6">
 
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <a href="{{ route('ordenes-compra-cliente.index') }}" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">O/C de Clientes</a>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">{{ $orden->numero_oc }}</span>
@@ -30,7 +30,7 @@
                 </a>
                 <a href="{{ route('ordenes-compra-cliente.index') }}"
                    class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all">
-                    ← Volver
+                    Volver
                 </a>
             </div>
         </div>
@@ -49,19 +49,19 @@
             <div class="bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-5 text-white">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Documento</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Documento</div>
                         <div class="text-sm font-bold mt-0.5">O/C DE CLIENTE</div>
                     </div>
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">N° O/C</div>
+                        <div class="text-[10px] text-slate-400 font-medium">N° O/C</div>
                         <div class="text-sm font-bold text-cyan-400 mt-0.5 font-mono">{{ $orden->numero_oc }}</div>
                     </div>
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Cliente</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Cliente</div>
                         <div class="text-xs font-bold mt-0.5 truncate">{{ $orden->cliente->razon_social ?: $orden->cliente->nombre }}</div>
                     </div>
                     <div>
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Fecha Recepción</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Fecha Recepción</div>
                         <div class="text-sm font-bold mt-0.5">{{ $orden->fecha_recepcion?->format('d/m/Y') }}</div>
                     </div>
                 </div>
@@ -70,21 +70,21 @@
             <!-- Tabs Navigation -->
             <div class="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
                 <div class="px-6 flex space-x-1 whitespace-nowrap">
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-bold text-xs uppercase tracking-wider" onclick="showTab('datos', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-semibold text-xs" onclick="showTab('datos', this)">
                         Datos de la Orden
                     </button>
                     @if($orden->archivo)
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('adjunto', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('adjunto', this)">
                         Documento Adjunto
                     </button>
                     @endif
                     @if($orden->cotizacionGenerada || $orden->ventaGenerada)
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('derivados', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('derivados', this)">
                         Docs. Derivados
                     </button>
                     @endif
                     @if($orden->estado === 'pendiente')
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('acciones', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('acciones', this)">
                         Acciones
                     </button>
                     @endif
@@ -98,21 +98,21 @@
                 <div id="datos" class="tab-content">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Cliente Emisor</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Cliente Emisor</span>
                             <p class="font-bold text-gray-900 dark:text-white text-sm">{{ $orden->cliente->razon_social ?: $orden->cliente->nombre }}</p>
                             <p class="text-xs text-gray-500 mt-0.5">RUC: {{ $orden->cliente->ruc ?: '—' }}</p>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">N° O/C del Cliente</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">N° O/C del Cliente</span>
                             <p class="font-bold font-mono text-cyan-600 dark:text-cyan-400 text-sm">{{ $orden->numero_oc }}</p>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Fecha de Recepción</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Fecha de Recepción</span>
                             <p class="font-semibold text-gray-800 dark:text-gray-200 text-sm">{{ $orden->fecha_recepcion?->format('d/m/Y') }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">{{ $orden->fecha_recepcion?->diffForHumans() }}</p>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Registrado por</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Registrado por</span>
                             <p class="font-semibold text-gray-800 dark:text-gray-200 text-sm">{{ $orden->usuario->name ?? '—' }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">{{ $orden->created_at?->format('d/m/Y H:i') }}</p>
                         </div>
@@ -120,7 +120,7 @@
 
                     @if($orden->observaciones)
                         <div class="pt-5 mt-5 border-t border-gray-100 dark:border-gray-700/60">
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Observaciones / Requerimientos</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Observaciones / Requerimientos</span>
                             <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-darker-bg p-3 rounded-xl">{{ $orden->observaciones }}</p>
                         </div>
                     @endif
@@ -130,7 +130,7 @@
                 @if($orden->archivo)
                 <div id="adjunto" class="tab-content hidden">
                     <div class="text-center space-y-4">
-                        <div class="bg-gray-50 dark:bg-darker-bg rounded-xl p-8 border border-gray-200 dark:border-gray-700/60">
+                        <div class="bg-gray-50 dark:bg-darker-bg rounded-xl p-6 border border-gray-200 dark:border-gray-700/60">
                             <svg class="w-16 h-16 mx-auto text-cyan-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             <p class="text-sm font-bold text-gray-900 dark:text-white mb-1">Documento adjunto por el cliente</p>
                             <p class="text-xs text-gray-500 mb-4">Archivo original de la orden de compra enviada por el cliente.</p>
@@ -145,9 +145,9 @@
                 @endif
 
                 <!-- Tab: Documentos Derivados -->
-                @if($orden->cotizacionGenerada || $orden->ventaGenerada)
+                @if($orden->cotizacionGenerada || $orden->ventas->isNotEmpty())
                 <div id="derivados" class="tab-content hidden">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 dark:text-white flex items-center gap-2 mb-4">
+                    <h4 class="text-xs font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         Documentos Comerciales Generados a partir de esta O/C
                     </h4>
@@ -159,13 +159,13 @@
                                 Cotización: {{ $orden->cotizacionGenerada->codigo_formateado }}
                             </a>
                         @endif
-                        @if($orden->ventaGenerada)
-                            <a href="{{ route('ventas.show', $orden->ventaGenerada) }}"
+                        @foreach($orden->ventas as $ventaDerivada)
+                            <a href="{{ route('ventas.show', $ventaDerivada) }}"
                                class="px-5 py-3 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-emerald-100 transition-all">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                                Venta: {{ $orden->ventaGenerada->codigo_formateado }}
+                                Venta: {{ $ventaDerivada->codigo_formateado }}
                             </a>
-                        @endif
+                        @endforeach
                     </div>
                 </div>
                 @endif

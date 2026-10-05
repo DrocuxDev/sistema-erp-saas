@@ -1,10 +1,10 @@
 <x-app-layout>
-    <div class="p-4 sm:p-6 space-y-6 max-w-6xl mx-auto">
+    <div class="page-container py-4 sm:py-6 space-y-6">
 
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <a href="{{ route('ordenes-compra.index') }}" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">Órdenes de Compra</a>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">{{ $orden_compra->codigo_formateado }}</span>
@@ -23,10 +23,19 @@
                         {{ $orden_compra->estado }}
                     </span>
                 </h1>
+                @if($cantidadRecibida > 0)
+                    <p class="text-xs text-cyan-700 dark:text-cyan-300 mt-1">Recepciones dependientes: {{ number_format($cantidadRecibida, 2) }} de {{ number_format($cantidadOrdenada, 2) }} unidades ordenadas.</p>
+                @endif
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                @if($orden_compra->estado === 'pendiente')
-                    <form action="{{ route('ordenes-compra.aprobar', $orden_compra) }}" method="POST" onsubmit="return confirm('¿Aprobar esta Orden de Compra?')">
+                @if($orden_compra->estado === 'aprobada')
+                    <a href="{{ route('compras.create', ['orden_compra_id' => $orden_compra->id]) }}"
+                       class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+                        Recepcionar compra
+                    </a>
+                @endif
+                @if($orden_compra->estado === 'pendiente' && auth()->user()->puedeAccion('aprobar'))
+                    <form action="{{ route('ordenes-compra.aprobar', $orden_compra) }}" method="POST" onsubmit="confirmFormSubmit(event, '¿Aprobar esta Orden de Compra?', 'Quedará aprobada y lista para recepcionar.', 'Aprobar', false)">
                         @csrf @method('PATCH')
                         <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -34,8 +43,8 @@
                         </button>
                     </form>
                 @endif
-                @if(in_array($orden_compra->estado, ['pendiente', 'aprobada']))
-                    <form action="{{ route('ordenes-compra.anular', $orden_compra) }}" method="POST" onsubmit="return confirm('¿Anular esta Orden de Compra?')">
+                @if(in_array($orden_compra->estado, ['pendiente', 'aprobada']) && auth()->user()->puedeAccion('anular'))
+                    <form action="{{ route('ordenes-compra.anular', $orden_compra) }}" method="POST" onsubmit="confirmFormSubmit(event, '¿Anular esta Orden de Compra?', 'La orden quedará anulada.', 'Anular')">
                         @csrf @method('PATCH')
                         <button type="submit" class="px-3 py-2 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 rounded-xl text-xs font-semibold transition-all">
                             Anular
@@ -44,7 +53,7 @@
                 @endif
                 <a href="{{ route('ordenes-compra.index') }}"
                    class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition-all">
-                    ← Volver
+                    Volver
                 </a>
             </div>
         </div>
@@ -69,19 +78,19 @@
             <div class="bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-5 text-white">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Documento</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Documento</div>
                         <div class="text-sm font-bold mt-0.5">ORDEN DE COMPRA</div>
                     </div>
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Código</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Código</div>
                         <div class="text-sm font-bold text-cyan-400 mt-0.5 font-mono">{{ $orden_compra->codigo_formateado }}</div>
                     </div>
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Proveedor</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Proveedor</div>
                         <div class="text-xs font-bold mt-0.5 truncate">{{ $orden_compra->proveedor->nombre ?? '—' }}</div>
                     </div>
                     <div>
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Total</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Total</div>
                         <div class="text-sm font-bold text-cyan-300 mt-0.5 font-mono">S/ {{ number_format($orden_compra->total, 2) }}</div>
                     </div>
                 </div>
@@ -90,13 +99,13 @@
             <!-- Tabs Navigation -->
             <div class="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
                 <div class="px-6 flex space-x-1 whitespace-nowrap">
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-bold text-xs uppercase tracking-wider" onclick="showTab('datos', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-semibold text-xs" onclick="showTab('datos', this)">
                         Datos de la O/C
                     </button>
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('items', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('items', this)">
                         Bienes ({{ count($detalles) }})
                     </button>
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('pdf', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('pdf', this)">
                         Visor PDF
                     </button>
                 </div>
@@ -109,22 +118,22 @@
                 <div id="datos" class="tab-content">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Proveedor / Razón Social</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Proveedor / Razón Social</span>
                             <p class="font-bold text-gray-900 dark:text-white text-sm">{{ $orden_compra->proveedor->razon_social ?: $orden_compra->proveedor->nombre }}</p>
                             <p class="text-xs text-gray-500 mt-0.5">RUC: {{ $orden_compra->proveedor->ruc ?: '—' }}</p>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Fecha de Emisión</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Fecha de Emisión</span>
                             <p class="font-semibold text-gray-800 dark:text-gray-200 text-sm">{{ $orden_compra->fecha?->format('d/m/Y') }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">{{ $orden_compra->fecha?->diffForHumans() }}</p>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Solicitado por</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Solicitado por</span>
                             <p class="font-semibold text-gray-800 dark:text-gray-200 text-sm">{{ $orden_compra->usuario->name ?? 'Área de Compras' }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">{{ $orden_compra->usuario->email ?? '' }}</p>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block mb-1">Monto Total O/C</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block mb-1">Monto Total O/C</span>
                             <p class="text-2xl font-bold font-mono text-cyan-600 dark:text-cyan-400">S/ {{ number_format($orden_compra->total, 2) }}</p>
                             <p class="text-xs text-gray-400 font-mono">Subtotal: S/ {{ number_format($orden_compra->subtotal, 2) }} | IGV: S/ {{ number_format($orden_compra->igv, 2) }}</p>
                         </div>
@@ -150,7 +159,7 @@
                 <div id="items" class="tab-content hidden">
                     <div class="overflow-x-auto -mx-6 -mb-6">
                         <table class="w-full text-xs text-left">
-                            <thead class="bg-slate-900 dark:bg-slate-950 text-white uppercase text-[10px] tracking-wider font-semibold">
+                            <thead class="bg-slate-900 dark:bg-slate-950 text-white text-xs font-semibold">
                                 <tr>
                                     <th class="px-4 py-3 text-center w-[5%]">#</th>
                                     <th class="px-4 py-3 w-[45%]">Producto / SKU</th>

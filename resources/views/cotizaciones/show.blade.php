@@ -1,10 +1,10 @@
 <x-app-layout>
-    <div class="p-4 sm:p-6 space-y-6 max-w-6xl mx-auto">
+    <div class="page-container py-4 sm:py-6 space-y-6">
 
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <a href="{{ route('cotizaciones.index') }}" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">Cotizaciones</a>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">{{ $cotizacion->codigo_formateado }}</span>
@@ -29,6 +29,9 @@
                         {{ $cotizacion->estado }}
                     </span>
                 </h1>
+                @if($cantidadVendida > 0)
+                    <p class="text-xs text-cyan-700 dark:text-cyan-300 mt-1">Ventas dependientes: {{ number_format($cantidadVendida, 2) }} de {{ number_format($cantidadCotizada, 2) }} unidades cotizadas.</p>
+                @endif
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {{ $cotizacion->asunto ?: 'Cotización comercial' }} — <strong class="text-gray-700 dark:text-gray-300">{{ $cotizacion->cliente->nombre ?? '—' }}</strong>
                 </p>
@@ -41,13 +44,15 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         Editar (v{{ sprintf('%03d', ($cotizacion->version ?: 1) + 1) }})
                     </a>
-                    <form action="{{ route('cotizaciones.aprobar', $cotizacion) }}" method="POST" onsubmit="return confirm('¿Aprobar esta cotización?')">
+                    @if(auth()->user()->puedeAccion('aprobar'))
+                    <form action="{{ route('cotizaciones.aprobar', $cotizacion) }}" method="POST" onsubmit="confirmFormSubmit(event, '¿Aprobar esta cotización?', 'Quedará aprobada y lista para facturar.', 'Aprobar', false)">
                         @csrf @method('PATCH')
                         <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             Aprobar
                         </button>
                     </form>
+                    @endif
                 @endif
                 @if($cotizacion->estado === 'aprobada' && \Illuminate\Support\Facades\Route::has('ventas.create'))
                     <a href="{{ route('ventas.create', ['cotizacion_id' => $cotizacion->id]) }}"
@@ -58,7 +63,7 @@
                 @endif
                 <a href="{{ route('cotizaciones.index') }}"
                    class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition-all">
-                    ← Volver
+                    Volver
                 </a>
             </div>
         </div>
@@ -83,19 +88,19 @@
             <div class="bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-5 text-white">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Documento</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Documento</div>
                         <div class="text-sm font-bold mt-0.5">COTIZACIÓN</div>
                     </div>
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Código</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Código</div>
                         <div class="text-sm font-bold text-cyan-400 mt-0.5 font-mono">{{ $cotizacion->codigo_formateado }}</div>
                     </div>
                     <div class="border-r border-slate-700">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Versión</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Versión</div>
                         <div class="text-sm font-bold text-emerald-400 mt-0.5 font-mono">v{{ $cotizacion->version_formateada }}</div>
                     </div>
                     <div>
-                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Total</div>
+                        <div class="text-[10px] text-slate-400 font-medium">Total</div>
                         <div class="text-sm font-bold text-cyan-300 mt-0.5 font-mono">
                             S/ {{ number_format($cotizacion->resumen->total_facturar ?? 0, 2) }}
                         </div>
@@ -106,16 +111,16 @@
             <!-- Tabs Navigation -->
             <div class="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
                 <div class="px-6 flex space-x-1 whitespace-nowrap">
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-bold text-xs uppercase tracking-wider" onclick="showTab('datos', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 font-semibold text-xs" onclick="showTab('datos', this)">
                         Datos del Proyecto
                     </button>
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('items', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('items', this)">
                         Ítems ({{ $cotizacion->detalles->count() }})
                     </button>
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('financiero', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('financiero', this)">
                         Resumen Financiero
                     </button>
-                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-semibold text-xs uppercase tracking-wider" onclick="showTab('pdf', this)">
+                    <button class="tab-btn py-3.5 px-4 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium text-xs" onclick="showTab('pdf', this)">
                         Visor PDF
                     </button>
                 </div>
@@ -128,7 +133,7 @@
                 <div id="datos" class="tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
                         <div class="space-y-2">
-                            <p class="font-bold text-gray-400 uppercase tracking-wider text-[10px]">Cliente / Razón Social</p>
+                            <p class="font-medium text-gray-400 text-[10px]">Cliente / Razón Social</p>
                             <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $cotizacion->cliente->nombre ?? '—' }}</p>
                             @if($cotizacion->cliente->razon_social && $cotizacion->cliente->razon_social !== $cotizacion->cliente->nombre)
                                 <p class="text-gray-500">{{ $cotizacion->cliente->razon_social }}</p>
@@ -139,7 +144,7 @@
                             @endif
                         </div>
                         <div class="space-y-2">
-                            <p class="font-bold text-gray-400 uppercase tracking-wider text-[10px]">Representante & Proyecto</p>
+                            <p class="font-medium text-gray-400 text-[10px]">Representante & Proyecto</p>
                             <p class="text-gray-700 dark:text-gray-300">Atención: <strong class="text-gray-900 dark:text-white">{{ $cotizacion->representante ?: ($cotizacion->cliente->contacto ?: '—') }}</strong></p>
                             <p class="text-gray-700 dark:text-gray-300">Asunto: <strong class="text-cyan-600 dark:text-cyan-400">{{ $cotizacion->asunto ?: 'Cotización TI' }}</strong></p>
                             <p class="text-gray-600 dark:text-gray-400">Fecha: <span class="font-semibold text-gray-900 dark:text-white">{{ $cotizacion->fecha?->format('d/m/Y') }}</span></p>
@@ -148,7 +153,7 @@
                         <div class="space-y-3">
                             @if($cotizacion->ordenCompraCliente)
                                 <div class="bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 rounded-xl p-3">
-                                    <span class="text-gray-500 text-[10px] uppercase font-bold">O/C Cliente Asociada:</span>
+                                    <span class="text-gray-500 text-[10px] font-semibold">O/C Cliente Asociada:</span>
                                     <a href="{{ route('ordenes-compra-cliente.show', $cotizacion->ordenCompraCliente) }}" class="text-cyan-600 dark:text-cyan-400 hover:underline font-bold font-mono block mt-0.5">
                                         {{ $cotizacion->ordenCompraCliente->numero_oc }}
                                     </a>
@@ -160,19 +165,19 @@
                     <!-- Términos y Condiciones -->
                     <div class="border-t border-gray-100 dark:border-gray-700/60 pt-5 mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs bg-gray-50/70 dark:bg-darker-bg/50 p-4 rounded-xl">
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block">Plazo de Entrega</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block">Plazo de Entrega</span>
                             <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $cotizacion->plazo_entrega ?: '2 a 5 días hábiles' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block">Forma de Pago</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block">Forma de Pago</span>
                             <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $cotizacion->forma_pago ?: '30 días calendario' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block">Logística</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block">Logística</span>
                             <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $cotizacion->logistica ?: 'Lima Metropolitana' }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-400 text-[10px] uppercase font-bold block">Validez Oferta</span>
+                            <span class="text-gray-400 text-[10px] font-semibold block">Validez Oferta</span>
                             <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $cotizacion->validez_oferta ?: '15 días' }}</span>
                         </div>
                     </div>
@@ -182,7 +187,7 @@
                 <div id="items" class="tab-content hidden">
                     <div class="overflow-x-auto -mx-6 -mb-6">
                         <table class="w-full text-xs text-left">
-                            <thead class="bg-slate-900 text-white uppercase text-[10px] tracking-wider font-semibold">
+                            <thead class="bg-slate-900 text-white text-xs font-semibold">
                                 <tr>
                                     <th class="px-3 py-3 w-[5%] text-center">#</th>
                                     <th class="px-4 py-3 w-[30%]">Producto / Descripción</th>
@@ -231,7 +236,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Totales Comerciales -->
                         <div class="bg-gray-50 dark:bg-darker-bg rounded-xl p-5 border border-gray-200 dark:border-gray-700/60 space-y-3">
-                            <h4 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 pb-3 flex items-center gap-2">
+                            <h4 class="text-xs font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-3 flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
                                 Resumen de Venta / Facturación Comercial
                             </h4>
@@ -263,7 +268,7 @@
                         <!-- Análisis Interno (Admin Only) -->
                         @if(auth()->user()->rol === 'administrador')
                         <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl p-5 shadow-lg space-y-3">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-cyan-400 border-b border-slate-700 pb-3 flex items-center justify-between">
+                            <h4 class="text-xs font-semibold text-cyan-400 border-b border-slate-700 pb-3 flex items-center justify-between">
                                 <span>Análisis Interno de Rentabilidad</span>
                                 <span class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 text-[10px]">ADMIN</span>
                             </h4>

@@ -2,15 +2,12 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <span>Administración</span>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">Configuración</span>
                 </div>
                 <h2 class="font-bold text-2xl text-gray-900 dark:text-white flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </span>
                     Configuración General del Sistema
                 </h2>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -21,14 +18,14 @@
     </x-slot>
 
     <div class="py-6 sm:py-8">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="page-container space-y-6">
             @if (session('success'))
                 <div class="p-4 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-2xl text-green-800 dark:text-green-300 font-semibold text-sm">
                     ✓ {{ session('success') }}
                 </div>
             @endif
 
-            <form action="{{ route('configuracion.update') }}" method="POST" class="space-y-6">
+            <form action="{{ route('configuracion.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" data-dirty-check>
                 @csrf
                 @method('PUT')
 
@@ -104,7 +101,7 @@
                 <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-6 space-y-4">
                     <div class="border-b border-gray-100 dark:border-gray-700/60 pb-3">
                         <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-purple-primary"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-600 dark:bg-cyan-500"></span>
                             Valores y Términos Comerciales Predeterminados
                         </h3>
                         <p class="text-xs text-gray-500">Se precargarán automáticamente al crear nuevas cotizaciones y órdenes de compra.</p>
@@ -137,108 +134,125 @@
                     </div>
                 </div>
 
-                {{-- 3. EDITOR DE PLANTILLA PDF DE COTIZACIÓN --}}
-                <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-6 space-y-4">
+                {{-- 3. APARTADO "COTIZACIÓN": PORTADA, IDENTIDAD Y TEXTOS DEL PDF --}}
+                <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-6 space-y-6">
                     <div class="border-b border-gray-100 dark:border-gray-700/60 pb-3">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <div>
-                                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                                    Plantilla HTML del PDF de Cotización
-                                </h3>
-                                <p class="text-xs text-gray-500">Edita directamente el HTML/CSS que genera el documento PDF. Usa las variables Blade disponibles para datos dinámicos.</p>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
+                            Cotización: portada, identidad y textos del PDF
+                        </h3>
+                        <p class="text-xs text-gray-500">Todo el contenido del PDF sale de esta configuración. Las cotizaciones ya emitidas conservan la configuración que tenían al emitirse.</p>
+                    </div>
+
+                    {{-- A. Portada --}}
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">A. Portada (página 1 del PDF)</h4>
+                        <div class="flex flex-col sm:flex-row gap-4 sm:items-start">
+                            <div class="space-y-2">
+                                @if($configuracion->portada_imagen_path)
+                                    <img src="{{ asset('storage/'.$configuracion->portada_imagen_path) }}" alt="Portada actual"
+                                         class="w-24 rounded-lg border border-gray-300 dark:border-gray-600 object-cover" style="aspect-ratio: 1/1.4142;">
+                                    <form action="{{ route('configuracion.portada.destroy') }}" method="POST" onsubmit="return confirm('¿Borrar la imagen de portada? Las cotizaciones nuevas ya no tendrán portada.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-24 px-2 py-1.5 rounded-lg bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-[11px] font-bold hover:bg-red-200 dark:hover:bg-red-900/40 transition-colors">Borrar portada</button>
+                                    </form>
+                                @else
+                                    <div class="w-24 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg flex items-center justify-center text-[10px] text-gray-400 text-center px-2" style="aspect-ratio: 1/1.4142;">Sin portada</div>
+                                @endif
                             </div>
-                            <div class="flex items-center gap-2">
-                                <button type="button" id="btn-toggle-guide"
-                                        class="px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 rounded-lg text-xs font-semibold hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors">
-                                    📖 Ver Variables Disponibles
-                                </button>
-                                <button type="button" id="btn-restore-default"
-                                        class="px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-xs font-semibold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                                    🔄 Restaurar Plantilla Original
-                                </button>
+                            <div class="flex-1 space-y-2">
+                                <input type="file" name="portada" accept=".jpg,.jpeg,.png"
+                                       class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-xs">
+                                <p class="text-[11px] text-gray-500">JPG o PNG, máx. 5 MB, proporción A4 vertical (más alta que ancha).</p>
+                                @error('portada')<p class="text-[11px] font-semibold text-red-600">{{ $message }}</p>@enderror
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <label class="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                                        <input type="checkbox" name="incluir_portada" value="1" {{ old('incluir_portada', $configuracion->incluir_portada) ? 'checked' : '' }}
+                                               class="rounded border-gray-300 text-emerald-600 w-4 h-4">
+                                        Incluir portada en las cotizaciones
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Guía de Variables Colapsable --}}
-                    <div id="template-guide" class="hidden bg-slate-50 dark:bg-darker-bg rounded-xl p-4 border border-slate-200 dark:border-gray-700 text-xs space-y-3">
-                        <h4 class="font-bold text-gray-900 dark:text-white text-sm">Variables Blade Disponibles</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <p class="font-bold text-gray-700 dark:text-gray-300 mb-1">📋 Datos de la Empresa (desde Configuración)</p>
-                                <ul class="space-y-0.5 text-gray-600 dark:text-gray-400 font-mono text-[10px]">
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $config->razon_social }}</code> — Razón Social</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $config->ruc }}</code> — RUC</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $config->direccion }}</code> — Dirección</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $config->telefono }}</code> — Teléfonos</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $config->email }}</code> — Emails</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $config->sitio_web }}</code> — Web</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $config->cuentas_bancarias }}</code> — Cuentas Bancarias</li>
-                                </ul>
+                    {{-- B. Identidad --}}
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">B. Identidad (logo y colores del PDF)</h4>
+                        <div class="flex flex-col sm:flex-row gap-4 sm:items-start">
+                            <div class="space-y-2">
+                                @if($configuracion->logo_path)
+                                    <img src="{{ asset('storage/'.$configuracion->logo_path) }}" alt="Logo actual"
+                                         class="h-14 max-w-[160px] object-contain rounded-lg border border-gray-300 dark:border-gray-600 bg-white px-2 py-1">
+                                    <form action="{{ route('configuracion.logo.destroy') }}" method="POST" onsubmit="return confirm('¿Borrar el logo? Las cotizaciones nuevas saldrán sin logo en el encabezado.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-full px-2 py-1.5 rounded-lg bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-[11px] font-bold hover:bg-red-200 dark:hover:bg-red-900/40 transition-colors">Borrar logo</button>
+                                    </form>
+                                @else
+                                    <div class="h-14 w-40 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg flex items-center justify-center text-[10px] text-gray-400">Sin logo</div>
+                                @endif
                             </div>
-                            <div>
-                                <p class="font-bold text-gray-700 dark:text-gray-300 mb-1">📄 Datos de la Cotización</p>
-                                <ul class="space-y-0.5 text-gray-600 dark:text-gray-400 font-mono text-[10px]">
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $codigoCompleto }}</code> — Código (C001-X)</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->fecha->format('d/m/Y') }}</code> — Fecha</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->cliente->nombre }}</code> — Nombre Cliente</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->cliente->ruc }}</code> — RUC Cliente</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->representante }}</code> — Atención</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->asunto }}</code> — Asunto / Proyecto</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->forma_pago }}</code> — Forma de Pago</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->plazo_entrega }}</code> — Plazo Entrega</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $cotizacion->validez_oferta }}</code> — Validez Oferta</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-700 dark:text-gray-300 mb-1">💰 Datos Financieros</p>
-                                <ul class="space-y-0.5 text-gray-600 dark:text-gray-400 font-mono text-[10px]">
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $subtotal }}</code> — Subtotal</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $igv }}</code> — IGV</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $total }}</code> — Total</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $montoEnLetras }}</code> — Monto en Letras</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-700 dark:text-gray-300 mb-1">📦 Ítems (dentro de @@forelse)</p>
-                                <ul class="space-y-0.5 text-gray-600 dark:text-gray-400 font-mono text-[10px]">
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $item->producto->nombre }}</code> — Nombre Producto</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $item->producto->sku }}</code> — SKU / Código</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $item->cantidad }}</code> — Cantidad</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $item->unidad_medida }}</code> — Unidad de Medida</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $item->precio_venta_unit }}</code> — Precio Unitario</li>
-                                    <li><code class="bg-slate-200 dark:bg-gray-700 px-1 rounded">@{{ $item->precio_venta_total }}</code> — Precio Total</li>
-                                </ul>
+                            <div class="flex-1 space-y-2">
+                                <input type="file" name="logo" accept=".jpg,.jpeg,.png"
+                                       class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-xs">
+                                <p class="text-[11px] text-gray-500">Logo del encabezado. JPG o PNG, máx. 2 MB.</p>
+                                @error('logo')<p class="text-[11px] font-semibold text-red-600">{{ $message }}</p>@enderror
                             </div>
                         </div>
-                        <div class="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                            <p class="text-amber-800 dark:text-amber-300 text-[10px]"><strong>⚠️ Importante:</strong> El template usa DomPDF que NO soporta flexbox ni CSS grid. Usa <code>&lt;table&gt;</code> para layouts. Si el template queda vacío, se usará el template original del sistema.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Color principal (franja, totales, recuadros)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" name="color_principal" value="{{ old('color_principal', $configuracion->color_principal ?: '#0076A8') }}"
+                                           class="w-10 h-9 rounded border border-gray-300 dark:border-gray-600 bg-white p-0.5">
+                                    <input type="text" value="{{ old('color_principal', $configuracion->color_principal ?: '#0076A8') }}" readonly
+                                           class="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-darker-bg px-3 py-2 text-xs font-mono">
+                                </div>
+                                @error('color_principal')<p class="text-[11px] font-semibold text-red-600">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Color del encabezado de la tabla (negro por defecto)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" name="color_tabla_encabezado" value="{{ old('color_tabla_encabezado', $configuracion->color_tabla_encabezado ?: '#111111') }}"
+                                           class="w-10 h-9 rounded border border-gray-300 dark:border-gray-600 bg-white p-0.5">
+                                    <input type="text" value="{{ old('color_tabla_encabezado', $configuracion->color_tabla_encabezado ?: '#111111') }}" readonly
+                                           class="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-darker-bg px-3 py-2 text-xs font-mono">
+                                </div>
+                                @error('color_tabla_encabezado')<p class="text-[11px] font-semibold text-red-600">{{ $message }}</p>@enderror
+                            </div>
                         </div>
                     </div>
 
-                    {{-- Editor de Código HTML --}}
+                    {{-- C. Textos predefinidos --}}
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300">C. Textos predefinidos del PDF</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Texto de saludo (variables: {empresa}, {cliente})</label>
+                            <textarea name="texto_saludo" rows="3"
+                                      class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-xs resize-none">{{ old('texto_saludo', $configuracion->texto_saludo ?: 'Reciban un saludo cordial por parte de {empresa}, nos dirigimos hacia usted a fin de presentarle la cotización solicitada. Estaremos a su disposición por cualquier duda o consulta.') }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Condiciones adicionales por defecto (se precargan en cada cotización, editables por documento)</label>
+                            <textarea name="condiciones_adicionales_default" rows="2" placeholder="Ej: Stock sujeto a disponibilidad. Garantía de 12 meses por defectos de fabricación."
+                                      class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-xs resize-none">{{ old('condiciones_adicionales_default', $configuracion->condiciones_adicionales_default) }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Texto de firma (variable: {empresa})</label>
+                            <textarea name="texto_firma" rows="3"
+                                      class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-xs resize-none">{{ old('texto_firma', $configuracion->texto_firma ?: "Atentamente,\nEjecutivo de Ventas,\n{empresa}") }}</textarea>
+                        </div>
+                    </div>
+
+                    {{-- D (titular). Las cuentas se gestionan en la sección siguiente. --}}
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                            Código HTML/Blade de la Plantilla
-                            <span class="font-normal text-gray-400 ml-1">(dejar vacío para usar la plantilla por defecto del sistema)</span>
-                        </label>
-                        <textarea name="pdf_template_cotizacion" id="pdf-template-editor" rows="20" spellcheck="false"
-                                  class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-slate-900 text-green-400 px-4 py-3 text-xs font-mono resize-y leading-relaxed focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                                  style="tab-size: 4; -moz-tab-size: 4;"
-                                  placeholder="Dejar vacío para usar la plantilla por defecto del sistema...">{{ old('pdf_template_cotizacion', $configuracion->pdf_template_cotizacion) }}</textarea>
-                        <div class="flex items-center justify-between mt-2">
-                            <p class="text-[10px] text-gray-400">
-                                <span id="template-line-count">0</span> líneas · HTML + Blade + CSS inline
-                            </p>
-                            <button type="button" id="btn-preview-template"
-                                    class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-[10px] font-semibold transition-colors">
-                                👁️ Vista Previa (próximamente)
-                            </button>
-                        </div>
+                        <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Titular de las cuentas bancarias (se define una vez)</label>
+                        <input type="text" name="titular_cuenta" value="{{ old('titular_cuenta', $configuracion->titular_cuenta) }}"
+                               placeholder="Ej: JHARDSYSTEX S.A.C."
+                               class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg text-gray-900 dark:text-white px-3 py-2 text-xs">
                     </div>
                 </div>
-
                 {{-- 4. TASAS FINANCIERAS E IMPOSITIVAS --}}
                 <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-6 space-y-4">
                     <div class="border-b border-gray-100 dark:border-gray-700/60 pb-3">
@@ -276,62 +290,83 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end pt-2">
+                <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2">
+                    <a href="{{ route('configuracion.pdf-ejemplo') }}" target="_blank" rel="noopener"
+                       class="px-6 py-2.5 rounded-xl text-xs font-bold border border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-colors text-center">
+                        Ver PDF de ejemplo
+                    </a>
                     <button type="submit"
-                            class="px-6 py-2.5 bg-gradient-to-r from-purple-primary to-indigo-600 hover:from-purple-light hover:to-indigo-500 text-white rounded-xl text-sm font-bold shadow-md shadow-purple-900/20 transition-all">
+                            class="btn-primary px-6 py-2.5">
                         Guardar Toda la Configuración
                     </button>
                 </div>
             </form>
+
+            {{-- D. CUENTAS BANCARIAS (lista estructurada para el PDF) --}}
+            <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-6 space-y-4">
+                <div class="border-b border-gray-100 dark:border-gray-700/60 pb-3">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        Cuentas bancarias del PDF
+                    </h3>
+                    <p class="text-xs text-gray-500">Banco, moneda, cuenta y CCI. Marca cuáles se muestran en el PDF. El titular se define una vez en la sección anterior.</p>
+                </div>
+
+                @foreach($cuentas as $cuenta)
+                    <form id="cuenta-update-{{ $cuenta->id }}" action="{{ route('configuracion.cuentas.update', $cuenta) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                    </form>
+                @endforeach
+                <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-gray-50 dark:bg-darker-bg text-gray-600 dark:text-gray-300">
+                            <tr>
+                                <th class="px-3 py-2">Banco</th>
+                                <th class="px-3 py-2">Moneda</th>
+                                <th class="px-3 py-2">N° de cuenta</th>
+                                <th class="px-3 py-2">CCI</th>
+                                <th class="px-3 py-2 text-center">En PDF</th>
+                                <th class="px-3 py-2 text-center">Orden</th>
+                                <th class="px-3 py-2 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700/60">
+                            @forelse($cuentas as $cuenta)
+                                <tr>
+                                    <td class="px-2 py-1.5"><input type="text" form="cuenta-update-{{ $cuenta->id }}" name="banco" value="{{ $cuenta->banco }}" required class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1 text-xs"></td>
+                                    <td class="px-2 py-1.5"><input type="text" form="cuenta-update-{{ $cuenta->id }}" name="moneda" value="{{ $cuenta->moneda }}" required class="w-20 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1 text-xs"></td>
+                                    <td class="px-2 py-1.5"><input type="text" form="cuenta-update-{{ $cuenta->id }}" name="numero_cuenta" value="{{ $cuenta->numero_cuenta }}" required class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1 text-xs font-mono"></td>
+                                    <td class="px-2 py-1.5"><input type="text" form="cuenta-update-{{ $cuenta->id }}" name="cci" value="{{ $cuenta->cci }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1 text-xs font-mono"></td>
+                                    <td class="px-2 py-1.5 text-center"><input type="checkbox" form="cuenta-update-{{ $cuenta->id }}" name="mostrar_en_pdf" value="1" {{ $cuenta->mostrar_en_pdf ? 'checked' : '' }} class="rounded border-gray-300 w-4 h-4"></td>
+                                    <td class="px-2 py-1.5 text-center"><input type="number" form="cuenta-update-{{ $cuenta->id }}" name="orden" value="{{ $cuenta->orden }}" min="0" max="999" class="w-14 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-1 py-1 text-xs text-center"></td>
+                                    <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                                        <button type="submit" form="cuenta-update-{{ $cuenta->id }}" class="px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold">Guardar</button>
+                                        <form action="{{ route('configuracion.cuentas.destroy', $cuenta) }}" method="POST" class="inline" onsubmit="return confirm('¿Eliminar esta cuenta bancaria?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-2 py-1 rounded-lg bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-[11px] font-bold">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="px-3 py-3 text-center text-gray-400">Sin cuentas registradas. Agrega la primera abajo.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <form action="{{ route('configuracion.cuentas.store') }}" method="POST" class="grid grid-cols-2 sm:grid-cols-7 gap-2 items-end bg-gray-50 dark:bg-darker-bg/50 rounded-xl p-3">
+                    @csrf
+                    <div><label class="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1">Banco *</label><input type="text" name="banco" required placeholder="BCP" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1.5 text-xs"></div>
+                    <div><label class="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1">Moneda *</label><input type="text" name="moneda" value="Soles" required class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1.5 text-xs"></div>
+                    <div class="col-span-2"><label class="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1">N° de cuenta *</label><input type="text" name="numero_cuenta" required placeholder="193-XXXXXXX" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1.5 text-xs font-mono"></div>
+                    <div class="col-span-2"><label class="block text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1">CCI</label><input type="text" name="cci" placeholder="002-XXXXXXX" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-darker-bg px-2 py-1.5 text-xs font-mono"></div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <button type="submit" class="w-full px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">+ Agregar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-    {{-- Hidden input with default template for restore functionality --}}
-    <textarea id="default-template-source" class="hidden">{!! e($defaultTemplate) !!}</textarea>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const editor = document.getElementById('pdf-template-editor');
-            const lineCount = document.getElementById('template-line-count');
-            const guidePanel = document.getElementById('template-guide');
-            const btnGuide = document.getElementById('btn-toggle-guide');
-            const btnRestore = document.getElementById('btn-restore-default');
-            const defaultSource = document.getElementById('default-template-source');
-
-            // Line counter
-            function updateLineCount() {
-                const lines = editor.value ? editor.value.split('\n').length : 0;
-                lineCount.textContent = lines;
-            }
-            editor.addEventListener('input', updateLineCount);
-            updateLineCount();
-
-            // Tab key support in textarea
-            editor.addEventListener('keydown', function(e) {
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const start = this.selectionStart;
-                    const end = this.selectionEnd;
-                    this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-                    this.selectionStart = this.selectionEnd = start + 4;
-                    updateLineCount();
-                }
-            });
-
-            // Toggle guide
-            btnGuide.addEventListener('click', function () {
-                guidePanel.classList.toggle('hidden');
-                this.textContent = guidePanel.classList.contains('hidden')
-                    ? '📖 Ver Variables Disponibles'
-                    : '📖 Ocultar Variables';
-            });
-
-            // Restore default
-            btnRestore.addEventListener('click', function () {
-                if (confirm('¿Restaurar la plantilla original del sistema? Se perderán los cambios personalizados.')) {
-                    editor.value = defaultSource.value;
-                    updateLineCount();
-                }
-            });
-        });
-    </script>
 </x-app-layout>

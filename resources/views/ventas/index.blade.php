@@ -4,15 +4,12 @@
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <span>Ventas</span>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">Registro de Ventas</span>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                    </span>
                     Registro de Ventas Facturadas (Serie V001)
                 </h1>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -66,7 +63,7 @@
         <div class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-xs text-left">
-                    <thead class="bg-slate-900 dark:bg-slate-950 text-white uppercase text-[10px] tracking-wider font-semibold border-b border-gray-200 dark:border-gray-800">
+                    <thead class="bg-slate-900 dark:bg-slate-950 text-white text-xs font-semibold border-b border-gray-200 dark:border-gray-800">
                         <tr>
                             <th class="px-4 py-3.5">Código Venta</th>
                             <th class="px-4 py-3.5">Cliente</th>
@@ -99,12 +96,8 @@
                                 </td>
                                 <td class="px-4 py-3.5 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('ventas.show', $v) }}" class="px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 hover:bg-sky-100 font-semibold transition-colors">
-                                            Detalle
-                                        </a>
-                                        <a href="{{ route('ventas.pdf', $v) }}" target="_blank" class="p-1 text-slate-500 hover:text-cyan-600 transition-colors" title="Ver PDF">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        </a>
+                                        <x-action-button icon="view" color="cyan" label="Ver detalle de venta" :href="route('ventas.show', $v)" />
+                                        <x-action-button icon="pdf" color="slate" label="Ver PDF" :href="route('ventas.pdf', $v)" target="_blank" />
                                     </div>
                                 </td>
                             </tr>

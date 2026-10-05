@@ -304,8 +304,8 @@
             : null;
 
         $total = (float) $venta->total;
-        $subtotal = $venta->subtotal > 0 ? (float) $venta->subtotal : round($total / 1.18, 2);
-        $igv = $venta->igv > 0 ? (float) $venta->igv : round($total - $subtotal, 2);
+        $subtotal = (float) $venta->subtotal;
+        $igv = (float) $venta->igv;
         $montoEnLetras = \App\Support\NumeroALetras::convertir((float) $total, 'Soles');
         $codigoCompleto = $venta->codigo_formateado;
     @endphp

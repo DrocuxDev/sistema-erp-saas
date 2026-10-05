@@ -1,22 +1,19 @@
 <x-app-layout>
-    <div class="p-4 sm:p-6 max-w-4xl mx-auto space-y-6">
+    <div class="page-container py-4 sm:py-6 space-y-6">
 
         <div class="flex items-center justify-between">
             <div>
-                <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     <a href="{{ route('ordenes-compra-cliente.index') }}" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">O/C de Clientes</a>
                     <span>/</span>
                     <span class="text-gray-900 dark:text-white">Editar {{ $orden->numero_oc }}</span>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                    <span class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    </span>
                     Editar Orden de Compra de Cliente
                 </h1>
             </div>
             <a href="{{ route('ordenes-compra-cliente.show', $orden) }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-semibold transition-colors">
-                ← Volver al Detalle
+                Volver al detalle
             </a>
         </div>
 
@@ -31,18 +28,18 @@
             </div>
         @endif
 
-        <form action="{{ route('ordenes-compra-cliente.update', $orden) }}" method="POST" enctype="multipart/form-data"
+        <form action="{{ route('ordenes-compra-cliente.update', $orden) }}" method="POST" enctype="multipart/form-data" data-dirty-check
               class="bg-white dark:bg-card-bg rounded-2xl shadow-sm border border-gray-200/80 dark:border-gray-700/60 p-6 space-y-5">
             @csrf
             @method('PUT')
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="form-label-xs">
                         Cliente Emisor <span class="text-rose-500">*</span>
                     </label>
                     <select name="cliente_id" required
-                            class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                            class="form-input">
                         @foreach($clientes as $cliente)
                             <option value="{{ $cliente->id }}" {{ old('cliente_id', $orden->cliente_id) == $cliente->id ? 'selected' : '' }}>
                                 {{ $cliente->razon_social ?: $cliente->nombre }} — RUC: {{ $cliente->ruc ?: '—' }}
@@ -52,27 +49,27 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="form-label-xs">
                         Número de O/C del Cliente <span class="text-rose-500">*</span>
                     </label>
                     <input type="text" name="numero_oc" value="{{ old('numero_oc', $orden->numero_oc) }}" required
-                           class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                           class="form-input">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="form-label-xs">
                         Fecha de Recepción <span class="text-rose-500">*</span>
                     </label>
                     <input type="date" name="fecha_recepcion" value="{{ old('fecha_recepcion', $orden->fecha_recepcion?->format('Y-m-d')) }}" required
-                           class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                           class="form-input">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="form-label-xs">
                         Estado de la O/C <span class="text-rose-500">*</span>
                     </label>
                     <select name="estado" required
-                            class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                            class="form-input">
                         <option value="pendiente" {{ old('estado', $orden->estado) === 'pendiente' ? 'selected' : '' }}>Pendiente</option>
                         <option value="procesada" {{ old('estado', $orden->estado) === 'procesada' ? 'selected' : '' }}>Procesada</option>
                         <option value="anulada"   {{ old('estado', $orden->estado) === 'anulada'   ? 'selected' : '' }}>Anulada</option>
@@ -80,7 +77,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="form-label-xs">
                         Archivo Adjunto
                     </label>
                     @if($orden->archivo)
@@ -95,16 +92,16 @@
                 </div>
 
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold uppercase text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="form-label-xs">
                         Observaciones / Requerimientos
                     </label>
                     <textarea name="observaciones" rows="3"
-                              class="w-full text-xs rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-darker-bg px-3.5 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all resize-none">{{ old('observaciones', $orden->observaciones) }}</textarea>
+                              class="form-input resize-none">{{ old('observaciones', $orden->observaciones) }}</textarea>
                 </div>
             </div>
 
             <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700/60">
-                <button type="button" onclick="if(confirm('¿Eliminar esta orden de compra? Esta acción no se puede deshacer.')) document.getElementById('delete-oc-form').submit();"
+                <button type="button" onclick="submitAfterConfirm('delete-oc-form', '¿Eliminar esta orden de compra?', 'Esta acción no se puede deshacer.')"
                         class="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 rounded-xl text-xs font-semibold transition-all">
                     Eliminar O/C
                 </button>
